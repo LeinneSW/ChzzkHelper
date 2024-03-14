@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>치지직 투표 추첨기</title>
+    <link rel="stylesheet" href="./vote.css">
+    <script src="./vote.js"></script>
+</head>
+<body onload="connect()">
+    <div id="userList" style="border-right: 2px solid black; width: 240px">
+        <div class="text-center" style="border-bottom: 2px solid #000; height: 60px; font-size: 24px; font-weight: bold;">투표 참여자</div>
+    </div>
+    <div style="display: flex; flex-direction: column; flex: 1; margin: 0 20px;">
+        <div class="title">숫자 투표</div>
+        <hr width="99%">
+        <div style="display: flex; width: 100%;">
+            <button id="startBtn" class="btn" onclick="startVote(event)">시작</button>
+            <button id="endBtn" class="btn" onclick="this.disabled = true">마감</button>
+        </div>
+        <div style="display: flex; width: calc(100% - 20px); margin: 10px;">
+            <div style="flex: 1">득표 현황</div>
+            <button style="width: 60px;" onclick="changeCountVisibility(event)">숨기기</button>
+        </div>
+        <hr style="width: 99%; margin: 0 auto">
+        <ol style="font-size: 30px; margin: 20px">
+            <li>
+                <input class="input" type="text" placeholder="새 항목 추가" onfocusout="focusEvent(event)" spellcheck="false">
+                <span></span>
+            </li>
+        </ol>
+    </div>
+    <div style="display: flex; flex-direction: column; flex: 1; border-left: 2px solid black">
+        <div class="title text-center" style="border-bottom: 2px solid #000; padding: 14px">실시간 채팅</div>
+        <div id="chatBox"></div>
+    </div>
+</body>
+</html>
