@@ -1,31 +1,18 @@
 import {app, BrowserWindow, Tray, dialog} from "electron";
-import express from 'express';
-import {WebSocket, WebSocketServer} from 'ws'
+import {WebSocket} from 'ws'
 import path from 'path'
-import { Chzzk } from "./chzzk/chzzk";
+import {Chzzk} from "./chzzk/chzzk";
 import fsExists from "fs.promises.exists";
-import { readFile, writeFile } from "fs/promises";
-import { JSONData, delay, isNumeric, saveFile } from "./utils/utils";
-import { ChzzkClient } from "chzzk";
+import {readFile} from "fs/promises";
+import {saveFile} from "./utils/utils";
+import {Web} from "./web/web";
 
 let followList: string[] = []
 const alertSocket: WebSocket[] = []
 
 const voteSocket: WebSocket[] = []
 
-const web = express()
-web.use('/', express.static(path.join(__dirname , '/../public/')))
-web.get('/alert', (_, res) => {
-    res.sendFile(path.join(__dirname, '/../public/alert/alert.html'))
-})
-
-const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => {
-    const nidAuth = (await session.cookies.get({name: 'NID_AUT'}))[0]?.value || ''
-    const nidSession = (await session.cookies.get({name: 'NID_SES'}))[0]?.value || ''
-    if(!await Chzzk.setAuth(nidAuth, nidSession)){
-        return false
-    }
-
+const createCheckFollowInterval = () => {
     const filePath = path.join(app.getPath('userData'), 'follow.txt')
     fsExists(filePath).then(async v => {
         if(!v){
@@ -37,20 +24,29 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
         }else{
             followList = (await readFile(filePath, 'utf-8')).split('\n').map(v => v.trim()).filter(v => !!v)
         }
-    })
-
-    const server = web.listen(54321, () => {})
-    setInterval(async () => {
-        for(const followData of (await Chzzk.getFollowerList(10)).filter(user => !followList.includes(user.user.userIdHash))){
-            followList.push(followData.user.userIdHash)
-            const json = JSON.stringify({type: '팔로우', user: followData.user});
-            for(const client of alertSocket){
-                client.send(json)
+    }).then(() => {
+        setInterval(async () => {
+            for(const followData of (await Chzzk.getFollowerList(10)).filter(user => !followList.includes(user.user.userIdHash))){
+                followList.push(followData.user.userIdHash)
+                const json = JSON.stringify({type: '팔로우', user: followData.user});
+                for(const client of alertSocket){
+                    client.send(json)
+                }
             }
-        }
-        saveFile(app.getPath('userData'), 'follow.txt', followList.join('\n'))
-    }, 10000)
-    new WebSocketServer({server, path: '/ws'}).on('connection', async client => {
+            saveFile(app.getPath('userData'), 'follow.txt', followList.join('\n'))
+        }, 10000)
+    })
+}
+
+const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => {
+    const nidAuth = (await session.cookies.get({name: 'NID_AUT'}))[0]?.value || ''
+    const nidSession = (await session.cookies.get({name: 'NID_SES'}))[0]?.value || ''
+    if(!await Chzzk.setAuth(nidAuth, nidSession)){
+        return false
+    }
+
+    const web = new Web()
+    web.socket.on('connection', async client => {
         client.onmessage = data => {
             const message = data.data.toString('utf-8')
             switch(message){
@@ -62,16 +58,19 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
                     alertSocket.push(client)
                     client.onclose = () => alertSocket.splice(alertSocket.indexOf(client), 1)
                     return;
-                default:
             }
+            try{
+                const json = JSON.parse(message)
+                switch(json.type){
+                    case 'SEND_MESSAGE':
+                        json.message && Chzzk.chat.sendChat(json.message)
+                        break;
+                }
+            }catch{}
         }
-    });
-    
-    const chzzkChat = new ChzzkClient({nidAuth, nidSession}).chat({
-        channelId: Chzzk.userId,
-        pollInterval: 20 * 1000 // 20초
     })
-    chzzkChat.on('chat', chat => {
+    createCheckFollowInterval()
+    Chzzk.chat.on('chat', chat => {
         for(const client of voteSocket){
             client.send(JSON.stringify({
                 user: chat.profile,
@@ -79,19 +78,18 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
             }))
         }
     })
-    chzzkChat.connect()
     
     const icon = path.join(__dirname, '../resources/icon.png')
     const window = new BrowserWindow({
         width: 1280,
         height: 720,
+        icon,
         show: false,
         webPreferences: {
             nodeIntegration: true,
             defaultEncoding: 'utf-8',
         },
         autoHideMenuBar: true,
-        icon
     })
     const tray = new Tray(icon)
     tray.setToolTip('치지직 도우미')
@@ -136,16 +134,14 @@ app.whenReady().then(async () => {
     const listener = async (_: any, newUrl: string) => {
         const url = new URL(newUrl)
         if(url.hostname === 'chzzk.naver.com' && url.pathname === '/'){ // 로그인 성공
-            if(await acquireAuthPhase(window.webContents.session)){
-                window.close()
-            }else{
+            if(!await acquireAuthPhase(window.webContents.session)){
                 dialog.showMessageBox(window, {
                     type: 'error',
                     title: '로그인 도중 문제 발생',
                     message: '로그인 도중 알 수 없는 문제가 발견되었습니다. 프로그램을 다시 실행해주세요.'
                 })
-                window.close()
             }
+            window.close()
         }
     }
     window.webContents.on('did-navigate', listener)
