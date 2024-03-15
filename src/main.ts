@@ -19,14 +19,13 @@ web.get('/alert', (_, res) => {
     res.sendFile(path.join(__dirname, '/../public/alert.html'))
 })
 
-const acquireAuthPhase = async (cookies: Electron.Cookie[]): Promise<boolean> => {
-    const nidAuth = cookies.find(v => v.name === 'NID_AUT')?.value || ''
-    const nidSession = cookies.find(v => v.name === 'NID_SES')?.value || ''
-    if(!Chzzk.setAuth(nidAuth, nidSession)){
+const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => {
+    const nidAuth = (await session.cookies.get({name: 'NID_AUT'}))[0]?.value || ''
+    const nidSession = (await session.cookies.get({name: 'NID_SES'}))[0]?.value || ''
+    if(!await Chzzk.setAuth(nidAuth, nidSession)){
         return false
     }
 
-    //window.webContents.executeJavaScript('window')
     const filePath = path.join(app.getPath('userData'), 'follow.txt')
     fsExists(filePath).then(async v => {
         if(!v){
@@ -43,11 +42,13 @@ const acquireAuthPhase = async (cookies: Electron.Cookie[]): Promise<boolean> =>
     const server = web.listen(54321, () => {})
     setInterval(async () => {
         for(const followData of (await Chzzk.getFollowerList(10)).filter(user => !followList.includes(user.user.userIdHash))){
+            followList.push(followData.user.userIdHash)
             const json = JSON.stringify({type: '팔로우', user: followData.user});
             for(const client of alertSocket){
                 client.send(json)
             }
         }
+        saveFile(app.getPath('userData'), 'follow.txt', followList.join('\n'))
     }, 10000)
     new WebSocketServer({server, path: '/ws'}).on('connection', async client => {
         client.onmessage = data => {
@@ -66,24 +67,19 @@ const acquireAuthPhase = async (cookies: Electron.Cookie[]): Promise<boolean> =>
         }
     });
     
-    (async () => {
-        while(!Chzzk.userId){
-            await delay(100)
+    const chzzkChat = new ChzzkClient({nidAuth, nidSession}).chat({
+        channelId: Chzzk.userId,
+        pollInterval: 20 * 1000 // 20초
+    })
+    chzzkChat.on('chat', chat => {
+        for(const client of voteSocket){
+            client.send(JSON.stringify({
+                user: chat.profile,
+                message: chat.message,
+            }))
         }
-        const chzzkChat = new ChzzkClient({nidAuth, nidSession}).chat({
-            channelId: Chzzk.userId,
-            pollInterval: 20 * 1000 // 20초
-        })
-        chzzkChat.on('chat', chat => {
-            for(const client of voteSocket){
-                client.send(JSON.stringify({
-                    user: chat.profile,
-                    message: chat.message,
-                }))
-            }
-        })
-        chzzkChat.connect()
-    })()
+    })
+    chzzkChat.connect()
     
     const icon = path.join(__dirname, '../resources/icon.png')
     const window = new BrowserWindow({
@@ -132,33 +128,33 @@ app.whenReady().then(async () => {
     })
 
     await window.loadURL(`https://chzzk.naver.com/`)
-    if(!await acquireAuthPhase(await window.webContents.session.cookies.get({}))){
-        const listener = async (_: any, newUrl: string) => {
-            const url = new URL(newUrl)
-            if(url.hostname === 'chzzk.naver.com' && url.pathname === '/'){ // 로그인 성공
-                await delay(200)
-                if(await acquireAuthPhase(await window.webContents.session.cookies.get({}))){
-                    window.close()
-                }else{
-                    dialog.showMessageBox(window, {
-                        type: 'error',
-                        title: '로그인 도중 문제 발생',
-                        message: '로그인 도중 알 수 없는 문제가 발견되었습니다. 프로그램을 다시 실행해주세요.'
-                    })
-                    window.close()
-                }
+    if(await acquireAuthPhase(window.webContents.session)){
+        window.close()
+        return
+    }
+
+    const listener = async (_: any, newUrl: string) => {
+        const url = new URL(newUrl)
+        if(url.hostname === 'chzzk.naver.com' && url.pathname === '/'){ // 로그인 성공
+            if(await acquireAuthPhase(window.webContents.session)){
+                window.close()
+            }else{
+                dialog.showMessageBox(window, {
+                    type: 'error',
+                    title: '로그인 도중 문제 발생',
+                    message: '로그인 도중 알 수 없는 문제가 발견되었습니다. 프로그램을 다시 실행해주세요.'
+                })
+                window.close()
             }
         }
-        window.webContents.on('did-navigate', listener)
-        await window.loadURL(`https://nid.naver.com/nidlogin.login?url=https://chzzk.naver.com/`)
-        window.show()
-        
-        dialog.showMessageBox(window, {
-            type: 'info',
-            title: '네이버 로그인 필요',
-            message: '로그인이 필요한 서비스입니다.\n로그인 후 진행해주세요.'
-        })
-    }else{
-        window.close()
     }
+    window.webContents.on('did-navigate', listener)
+    await window.loadURL(`https://nid.naver.com/nidlogin.login?url=https://chzzk.naver.com/`)
+    window.show()
+    
+    dialog.showMessageBox(window, {
+        type: 'info',
+        title: '네이버 로그인 필요',
+        message: '로그인이 필요한 서비스입니다.\n로그인 후 진행해주세요.'
+    })
 })
