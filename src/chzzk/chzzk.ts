@@ -1,11 +1,13 @@
-import {ChzzkChat, ChzzkClient} from "chzzk";
-import {JSONData, delay} from "../utils/utils";
+import {ChzzkChat, ChzzkClient, Follower} from "chzzk";
+import {delay} from "../utils/utils";
 
 export class Chzzk{
     private static _userId: string = ''
     
     private static _chat: ChzzkChat
     private static _client: ChzzkClient
+
+    private constructor(){}
 
     static get userId(){
         return this._userId
@@ -24,13 +26,11 @@ export class Chzzk{
             this._client = new ChzzkClient({nidAuth, nidSession})
             while(!this._userId){
                 try{
-                    const res = await this._client.fetch(`https://comm-api.game.naver.com/nng_main/v1/user/getUserStatus`)
-                    this._userId = (await res.json()).content?.userIdHash
+                    this._userId = (await this._client.user()).userIdHash
                 }catch{
                     await delay(1000)
                 }
             }
-            
             this._chat = this._client.chat({
                 channelId: this._userId,
                 pollInterval: 20 * 1000 // 20초
@@ -41,10 +41,9 @@ export class Chzzk{
         return false
     }
 
-    static async getFollowerList(size: number = 10): Promise<JSONData[]>{
+    static async getFollowerList(size: number = 10): Promise<Follower[]>{
         try{
-            const res = await this._client.fetch(`https://api.chzzk.naver.com/manage/v1/channels/${this._userId}/followers?size=${size}`)
-            return (await res.json()).content.data
+            return (await this._client.manage.followers(this._userId, {size})).data || []
         }catch{}
         return []
     }
