@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>팔로우 알리미 가이드</title>
+    <script>
+        const copy = () => {
+            navigator.clipboard.writeText(`http://127.0.0.1:54321/alert`)
+            .then(() => alert('복사 완료'))
+            .catch(() => alert('복사 실패'))
+        }
+        const testFollow = () => {
+            alert('아직 기능 준비중입니다.')
+        }
+    </script>
+</head>
+<body>
+    <h1>팔로우 알리미 추가방법</h1>
+    <hr>
+    <h3>1. 아래 텍스트 복사하기</h3>
+    <span style="color: rgb(57, 57, 209)">http://127.0.0.1:54321/alert</span>
+    <button onclick="copy()">복사하기</button>
+    <h3>2. OBS 브라우저 소스 추가하기</h3>
+    <img src="./obs1.png">
+    <h3>3. 복사한 주소 붙여넣기</h3>
+    <img src="./obs2.png">
+    <h3>4. 아래 버튼 눌러 알림 잘 뜨는지 확인하기</h3>
+    <button onclick="testFollow()">테스트 알림</button>
+</body>
+</html>
