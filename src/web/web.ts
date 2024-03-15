@@ -24,7 +24,7 @@ export class Web{
 
         Web._instance = this
         this.app = express()
-        this.app.use('/', express.static(path.join(__dirname , '/../public/')))
+        this.app.use('/', express.static(path.join(__dirname , './../../public/')))
 
         this.server = this.app.listen(54321, () => {})
         this.socket = new WebSocketServer({server: this.server, path: '/ws'})

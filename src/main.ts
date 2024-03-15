@@ -13,7 +13,19 @@ const alertSocket: WebSocket[] = []
 const voteSocket: WebSocket[] = []
 
 const createCheckFollowTask = () => {
-    Web.instance.app.get('/alert', (_, res) => res.sendFile(path.join(__dirname, '/../public/alert/alert.html')))
+    Web.instance.app.post('/req/test_alert', (_, res) => {
+        res.sendStatus(200)
+
+        const json = JSON.stringify({
+            type: `팔로우`,
+            user: {
+                nickname: '테스트'
+            },
+        });
+        for(const client of alertSocket){
+            client.send(json)
+        }
+    })
 
     const filePath = path.join(app.getPath('userData'), 'follow.txt')
     fsExists(filePath).then(async v => {
