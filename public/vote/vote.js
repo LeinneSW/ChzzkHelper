@@ -74,6 +74,14 @@ const startVote = (event) => {
     }
 }
 
+const endVote = (event) => {
+    event.target.disabled = true
+    if(!countVisible){
+        countVisible = true
+        updateCount()
+    }
+}
+
 const updateCount = (elements) => {
     if(!elements){
         elements = document.querySelectorAll('ol > li > span')
