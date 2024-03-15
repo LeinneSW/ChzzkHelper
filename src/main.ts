@@ -31,7 +31,7 @@ const createCheckFollowTask = () => {
     fsExists(filePath).then(async v => {
         if(!v){
             const list = [];
-            for(const user of await Chzzk.getFollowerList(10000)){
+            for(const user of await Chzzk.instance.getFollowerList(10000)){
                 list.push(user.user.userIdHash)
             }
             saveFile(app.getPath('userData'), 'follow.txt', list.join('\n'))
@@ -40,7 +40,7 @@ const createCheckFollowTask = () => {
         }
     }).then(() => {
         setInterval(async () => {
-            for(const followData of (await Chzzk.getFollowerList(10)).filter(user => !followList.includes(user.user.userIdHash))){
+            for(const followData of (await Chzzk.instance.getFollowerList(10)).filter(user => !followList.includes(user.user.userIdHash))){
                 followList.push(followData.user.userIdHash)
                 const json = JSON.stringify({type: '팔로우', user: followData.user});
                 for(const client of alertSocket){
@@ -76,14 +76,14 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
                 const json = JSON.parse(message)
                 switch(json.type){
                     case 'SEND_MESSAGE':
-                        json.message && Chzzk.chat.sendChat(json.message)
+                        json.message && Chzzk.instance.chat.sendChat(json.message)
                         break;
                 }
             }catch{}
         }
     })
     createCheckFollowTask()
-    Chzzk.chat.on('chat', chat => {
+    Chzzk.instance.chat.on('chat', chat => {
         for(const client of voteSocket){
             client.send(JSON.stringify({
                 user: chat.profile,
