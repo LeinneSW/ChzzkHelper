@@ -10,21 +10,21 @@ export class Chzzk{
 
     static async setAuth(nidAuth: string, nidSession: string): Promise<boolean>{
         if(nidAuth && nidSession){
-            let userId = ''
+            let channelId = ''
             const client = new ChzzkClient({nidAuth, nidSession})
-            while(!userId){
+            while(!channelId){
                 try{
-                    userId = (await client.user()).userIdHash
+                    channelId = (await client.user()).userIdHash
                 }catch{
                     await delay(1000)
                 }
             }
             const chat = client.chat({
-                channelId: userId,
+                channelId,
                 pollInterval: 20 * 1000 // 20초
             })
             chat.connect()
-            this._instance = new Chzzk(chat, client, userId)
+            this._instance = new Chzzk(chat, client, channelId)
             return true
         }
         return false
@@ -33,12 +33,12 @@ export class Chzzk{
     private constructor(
         public readonly chat: ChzzkChat,
         public readonly client: ChzzkClient,
-        public readonly userId: string
+        public readonly channelId: string
     ){}
 
     async getFollowerList(size: number = 10): Promise<Follower[]>{
         try{
-            return (await this.client.manage.followers(this.userId, {size})).data || []
+            return (await this.client.manage.followers(this.channelId, {size})).data || []
         }catch{}
         return []
     }
