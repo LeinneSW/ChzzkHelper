@@ -4,26 +4,29 @@ import path from "path";
 import {WebSocketServer} from 'ws'
 
 export class Web{
-    private readonly app: Express
-    private _server: Server
-    private _socket: WebSocketServer
+    private static _instance: Web
 
-    constructor(){
+    static get instance(): Web{
+        if(!this._instance){
+            this._instance = new Web()
+        }
+        return this._instance
+    }
+
+    public readonly app: Express
+    public readonly server: Server
+    public readonly socket: WebSocketServer
+
+    private constructor(){
+        if(Web._instance){
+            throw new Error('Web instance는 한개만 존재해야합니다.')   
+        }
+
+        Web._instance = this
         this.app = express()
         this.app.use('/', express.static(path.join(__dirname , '/../public/')))
-        this.app.get('/alert', (_, res) => {
-            res.sendFile(path.join(__dirname, '/../public/alert/alert.html'))
-        })
 
-        this._server = this.app.listen(54321, () => {})
-        this._socket = new WebSocketServer({server: this._server, path: '/ws'})
-    }
-
-    get server(){
-        return this._server
-    }
-
-    get socket(){
-        return this._socket
+        this.server = this.app.listen(54321, () => {})
+        this.socket = new WebSocketServer({server: this.server, path: '/ws'})
     }
 }

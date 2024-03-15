@@ -12,7 +12,9 @@ const alertSocket: WebSocket[] = []
 
 const voteSocket: WebSocket[] = []
 
-const createCheckFollowInterval = () => {
+const createCheckFollowTask = () => {
+    Web.instance.app.get('/alert', (_, res) => res.sendFile(path.join(__dirname, '/../public/alert/alert.html')))
+
     const filePath = path.join(app.getPath('userData'), 'follow.txt')
     fsExists(filePath).then(async v => {
         if(!v){
@@ -45,8 +47,7 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
         return false
     }
 
-    const web = new Web()
-    web.socket.on('connection', async client => {
+    Web.instance.socket.on('connection', async client => {
         client.onmessage = data => {
             const message = data.data.toString('utf-8')
             switch(message){
@@ -69,7 +70,7 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
             }catch{}
         }
     })
-    createCheckFollowInterval()
+    createCheckFollowTask()
     Chzzk.chat.on('chat', chat => {
         for(const client of voteSocket){
             client.send(JSON.stringify({
