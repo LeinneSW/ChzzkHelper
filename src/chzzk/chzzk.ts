@@ -5,6 +5,9 @@ export class Chzzk{
     private static _instance: Chzzk
 
     static get instance(): Chzzk{
+        if(!this._instance){
+            throw new Error('Chzzk.setAuth()가 실행되기전엔 접근이 불가능합니다.')
+        }
         return this._instance
     }
 
