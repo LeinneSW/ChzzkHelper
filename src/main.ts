@@ -16,7 +16,7 @@ const voteSocket: WebSocket[] = []
 const web = express()
 web.use('/', express.static(path.join(__dirname , '/../public/')))
 web.get('/alert', (_, res) => {
-    res.sendFile(path.join(__dirname, '/../public/alert.html'))
+    res.sendFile(path.join(__dirname, '/../public/alert/alert.html'))
 })
 
 const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => {

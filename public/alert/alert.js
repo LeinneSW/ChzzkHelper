@@ -18,9 +18,7 @@ const showAlert = (data) => {
     document.getElementById('nickname').innerHTML = makeStrWithPulse(data.user?.nickname)
     try{
         new Audio('./follow.mp3').play()
-    }catch(e){
-        console.log(e)
-    }
+    }catch(e){}
 
     profile.src = data.user?.profileImageUrl || './profile_default.png'
     profile.onload = () => {
