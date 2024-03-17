@@ -70,6 +70,7 @@ const startVote = (event) => {
         input.readOnly = true
         const span = input.parentElement.children[1]
         span.innerHTML = '0명'
+        span.style = ''
         span.onclick = () => {}
     }
 }
@@ -99,7 +100,6 @@ const changeCountVisibility = (event) => {
     countVisible = !countVisible
     event.target.innerHTML = countVisible ? '숨기기' : '보이기'
     updateCount()
-
 }
 
 const focusEvent = (event) => {
@@ -114,6 +114,7 @@ const focusEvent = (event) => {
 
             const span = event.target.parentElement.children[1]
             span.innerHTML = 'X'
+            span.style = 'cursor: pointer'
             span.onclick = (event) => {event.target.parentElement.remove()}
         }
     }
