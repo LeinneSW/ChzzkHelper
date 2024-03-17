@@ -108,6 +108,7 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
         minimizable: false,
         autoHideMenuBar: true,
     })
+
     const tray = new Tray(icon)
     tray.setToolTip('치지직 도우미')
     tray.on('double-click', () => window.show())
@@ -160,7 +161,8 @@ app.whenReady().then(async () => {
         return
     }
 
-    const listener = async (_: any, newUrl: string) => {
+    await window.loadURL(`https://nid.naver.com/nidlogin.login?url=https://chzzk.naver.com/`)
+    window.webContents.on('did-navigate', async (_: any, newUrl: string) => {
         const url = new URL(newUrl)
         if(url.hostname === 'chzzk.naver.com' && url.pathname === '/'){ // 로그인 성공
             if(!await acquireAuthPhase(window.webContents.session)){
@@ -172,9 +174,7 @@ app.whenReady().then(async () => {
             }
             window.close()
         }
-    }
-    window.webContents.on('did-navigate', listener)
-    await window.loadURL(`https://nid.naver.com/nidlogin.login?url=https://chzzk.naver.com/`)
+    })
     window.show()
     
     dialog.showMessageBox(window, {
