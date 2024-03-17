@@ -1,4 +1,4 @@
-import {app, BrowserWindow, Tray, dialog} from "electron";
+import {app, BrowserWindow, Tray, dialog, Menu} from "electron";
 import {WebSocket} from 'ws'
 import path from 'path'
 import {Chzzk} from "./chzzk/chzzk";
@@ -97,31 +97,43 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
     
     const icon = path.join(__dirname, '../resources/icon.png')
     const window = new BrowserWindow({
-        width: 1280,
-        height: 720,
+        width: 1366,
+        height: 768,
         icon,
         show: false,
         webPreferences: {
             nodeIntegration: true,
             defaultEncoding: 'utf-8',
         },
+        minimizable: false,
         autoHideMenuBar: true,
     })
     const tray = new Tray(icon)
     tray.setToolTip('치지직 도우미')
     tray.on('double-click', () => window.show())
+    const trayMenu = Menu.buildFromTemplate([
+        {label: '종료', type: 'normal', click: () => {
+            let response = dialog.showMessageBoxSync(window, {
+                type: 'question',
+                buttons: ['예', '아니오'],
+                title: `치지직 도우미 종료`,
+                message: '치치직 도우미를 종료하시겠습니까?\n(프로그램이 켜져있어야 기능들이 동작합니다.)'
+            })
+            if(response !== 1){
+                window.close()
+            }
+        }}
+    ]);
+    tray.setContextMenu(trayMenu)
 
-    window.on('minimize', () => window.hide())
     window.on('close', event => {
-        let response = dialog.showMessageBoxSync(window, {
-            type: 'question',
-            buttons: ['예', '아니오'],
-            title: `치지직 도우미 종료`,
-            message: '치치직 도우미를 종료하시겠습니까?\n(프로그램이 켜져있어야 알리미가 동작합니다.)'
+        dialog.showMessageBoxSync(window, {
+            type: 'info',
+            title: `트레이로 최소화`,
+            message: '도우미는 종료되지않고 트레이로 최소화됩니다.\n(프로그램이 켜져있어야 기능들이 동작합니다.)'
         })
-        if(response === 1){
-            event.preventDefault()
-        }
+        window.hide()
+        event.preventDefault()
     })
     await window.loadFile(path.join(__dirname, '../public/index.html'))
     window.show()
