@@ -1,3 +1,4 @@
+let client
 const alertQueue = []
 
 const makeStrWithPulse = (str = 'undefined') => {
@@ -24,13 +25,13 @@ const showAlert = (data) => {
     profile.onload = () => {
         const element = document.getElementsByTagName('body')[0]
         element.classList.add('fadeIn')
-        element.style = ''
+        element.classList.remove('hidden')
     
         setTimeout(() => {
             element.classList.add('fadeOut')
             setTimeout(async () => {
                 element.classList = []
-                element.style = 'visibility: hidden'
+                element.classList.add('hidden')
     
                 await new Promise(res => setTimeout(res, 500))
                 alertQueue.splice(alertQueue.indexOf(data), 1)
@@ -52,7 +53,22 @@ const addAlertData = (data) => {
     }
 }
 
-let client
+const checkError = () => {
+    console.log('readyState', client?.readyState)
+    const body = document.getElementsByTagName('body')[0]
+    if(client?.readyState === WebSocket.OPEN){
+        body.classList.add('hidden')
+        document.getElementById('error').classList.add('hidden')
+        document.getElementById('img').classList.remove('hidden')
+        document.getElementById('text').classList.remove('hidden')
+    }else{
+        body.classList.remove('hidden')
+        document.getElementById('img').classList.add('hidden')
+        document.getElementById('text').classList.add('hidden')
+        document.getElementById('error').classList.remove('hidden')
+    }
+}
+
 const connect = () => {
     if(client?.readyState === WebSocket.OPEN){
         return
@@ -60,12 +76,18 @@ const connect = () => {
 
     client?.close()
     client = new WebSocket(`ws://${location.host || `127.0.0.1:54321`}/ws`)
-    client.onopen = () => client.send('ALERT')
+    client.onopen = () => {
+        checkError()
+        client.send('ALERT')
+    }
     client.onmessage = (e) => {
         try{
             const data = JSON.parse(e.data.toString())
             addAlertData(data)
         }catch{}
     }
-    client.onclose = () => setTimeout(() => connect(), 1000)
+    client.onclose = () => {
+        checkError()
+        setTimeout(() => connect(), 1000)
+    }
 }

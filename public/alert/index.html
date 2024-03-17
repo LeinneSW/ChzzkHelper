@@ -6,7 +6,10 @@
     <link rel="stylesheet" href="./alert.css">
     <script src="./alert.js"></script>
 </head>
-<body onload="connect()" style="visibility: hidden">
+<body class="hidden" onload="connect()">
+    <div id="error" class="text-center hidden">
+        치지직 도우미가 꺼져있습니다
+    </div>
     <img id="img" src="./follow.gif">    
     <div id="text">
         <img id="profile" onerror="this.src = './profile_default.png'">
