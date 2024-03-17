@@ -4,14 +4,12 @@ import path from 'path'
 import {Chzzk} from "./chzzk/chzzk";
 import fsExists from "fs.promises.exists";
 import {readFile} from "fs/promises";
-import {saveFile} from "./utils/utils";
+import {isNumeric, saveFile} from "./utils/utils";
 import {Web} from "./web/web";
+
 
 let followList: string[] = []
 const alertSocket: WebSocket[] = []
-
-const voteSocket: WebSocket[] = []
-
 const createCheckFollowTask = () => {
     Web.instance.app.post('/req/test_alert', (_, res) => {
         res.sendStatus(200)
@@ -55,6 +53,24 @@ const createCheckFollowTask = () => {
     })
 }
 
+const reqSongSocket: WebSocket[] = []
+const createRequestSongTask = async () => {
+    Web.instance.socket.on('connection', client => {
+        client.on('message', (data) => {
+            try{
+                const message = data.toString('utf-8')
+                if(message === 'REQUEST_SONG'){
+                    reqSongSocket.push(client)
+                }else if(isNumeric(message)){
+                    // TODO: remove song & send song data
+                }
+            }catch{}
+        });
+        client.on('close', () => reqSongSocket.splice(reqSongSocket.indexOf(client), 1));
+    })
+}
+
+const voteSocket: WebSocket[] = []
 const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => {
     const nidAuth = (await session.cookies.get({name: 'NID_AUT'}))[0]?.value || ''
     const nidSession = (await session.cookies.get({name: 'NID_SES'}))[0]?.value || ''
@@ -86,6 +102,7 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
         }
     })
     createCheckFollowTask()
+    createRequestSongTask()
     Chzzk.instance.chat.on('chat', chat => {
         for(const client of voteSocket){
             client.send(JSON.stringify({
