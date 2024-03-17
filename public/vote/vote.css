@@ -13,8 +13,9 @@ body{
 
 .text-center{
     display: flex;
-    justify-content: center;
+    text-align: center;
     align-items: center;
+    justify-content: center;
 }
 
 .btn{
