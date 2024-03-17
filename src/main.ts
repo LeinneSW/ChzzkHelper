@@ -40,14 +40,17 @@ const createCheckFollowTask = () => {
         }
     }).then(() => {
         setInterval(async () => {
-            for(const followData of (await Chzzk.instance.getFollowerList(10)).filter(user => !followList.includes(user.user.userIdHash))){
-                followList.push(followData.user.userIdHash)
-                const json = JSON.stringify({type: '팔로우', user: followData.user});
-                for(const client of alertSocket){
-                    client.send(json)
+            const newData = (await Chzzk.instance.getFollowerList(10)).filter(user => !followList.includes(user.user.userIdHash))
+            if(newData.length > 0){
+                for(const followData of newData){
+                    followList.push(followData.user.userIdHash)
+                    const json = JSON.stringify({type: '팔로우', user: followData.user});
+                    for(const client of alertSocket){
+                        client.send(json)
+                    }
                 }
+                saveFile(app.getPath('userData'), 'follow.txt', followList.join('\n'))
             }
-            saveFile(app.getPath('userData'), 'follow.txt', followList.join('\n'))
         }, 10000)
     })
 }
