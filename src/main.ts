@@ -96,9 +96,12 @@ const createRequestSongTask = async () => {
                         client.onclose = () => alertSocket.splice(alertSocket.indexOf(client), 1)
                     }
                 }else if(isNumeric(message)){
-                    songList.splice(+message, 1)
-                    for(const client of reqSongSocket){
-                        client.send(JSON.stringify(songList))
+                    const index = parseInt(message)
+                    if(0 <= index && index < songList.length){
+                        songList.splice(+message, 1)
+                        for(const client of reqSongSocket){
+                            client.send(JSON.stringify(songList))
+                        }
                     }
                 }
             }catch{}
