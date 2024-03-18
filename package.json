@@ -5,7 +5,7 @@
   "main": "build/main.js",
   "scripts": {
     "start": "tsc && cross-env DEBUG=true electron .",
-    "build": "electron-builder --win portable --x64"
+    "build": "tsc && electron-builder --win portable --x64"
   },
   "author": "LeinneSW",
   "license": "ISC",
