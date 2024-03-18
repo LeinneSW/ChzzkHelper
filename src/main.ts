@@ -7,13 +7,41 @@ import {readFile} from "fs/promises";
 import {isNumeric, saveFile} from "./utils/utils";
 import {Web} from "./web/web";
 
+const voteSocket: WebSocket[] = []
+const createVoteTask = async () => {
+    Web.instance.socket.on('connection', async client => {
+        client.onmessage = data => {
+            const message = data.data.toString('utf-8')
+            if(message === 'VOTE'){
+                voteSocket.push(client)
+                client.onclose = () => voteSocket.splice(voteSocket.indexOf(client), 1)
+            }else{
+                try{
+                    const json = JSON.parse(message)
+                    switch(json.type){
+                        case 'SEND_MESSAGE':
+                            json.message && Chzzk.instance.chat.sendChat(json.message)
+                            break;
+                    }
+                }catch{}
+            }
+        }
+    })
+}
 
 let followList: string[] = []
 const alertSocket: WebSocket[] = []
 const createCheckFollowTask = () => {
+    Web.instance.socket.on('connection', async client => {
+        client.onmessage = data => {
+            if(data.data.toString('utf-8') === 'ALERT'){
+                alertSocket.push(client)
+                client.onclose = () => alertSocket.splice(alertSocket.indexOf(client), 1)
+            }
+        }
+    })
     Web.instance.app.post('/req/test_alert', (_, res) => {
         res.sendStatus(200)
-
         const json = JSON.stringify({
             type: `팔로우`,
             user: {
@@ -70,7 +98,6 @@ const createRequestSongTask = async () => {
     })
 }
 
-const voteSocket: WebSocket[] = []
 const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => {
     const nidAuth = (await session.cookies.get({name: 'NID_AUT'}))[0]?.value || ''
     const nidSession = (await session.cookies.get({name: 'NID_SES'}))[0]?.value || ''
@@ -78,29 +105,7 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
         return false
     }
 
-    Web.instance.socket.on('connection', async client => {
-        client.onmessage = data => {
-            const message = data.data.toString('utf-8')
-            switch(message){
-                case 'VOTE':
-                    voteSocket.push(client)
-                    client.onclose = () => voteSocket.splice(voteSocket.indexOf(client), 1)
-                    return;
-                case 'ALERT':
-                    alertSocket.push(client)
-                    client.onclose = () => alertSocket.splice(alertSocket.indexOf(client), 1)
-                    return;
-            }
-            try{
-                const json = JSON.parse(message)
-                switch(json.type){
-                    case 'SEND_MESSAGE':
-                        json.message && Chzzk.instance.chat.sendChat(json.message)
-                        break;
-                }
-            }catch{}
-        }
-    })
+    createVoteTask()
     createCheckFollowTask()
     createRequestSongTask()
     Chzzk.instance.chat.on('chat', chat => {
