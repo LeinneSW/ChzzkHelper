@@ -4,7 +4,7 @@ import path from 'path'
 import {Chzzk} from "./chzzk/chzzk";
 import fsExists from "fs.promises.exists";
 import {readFile} from "fs/promises";
-import {isNumeric, saveFile} from "./utils/utils";
+import {JSONData, isNumeric, saveFile} from "./utils/utils";
 import {Web} from "./web/web";
 
 const voteSocket: WebSocket[] = []
@@ -13,8 +13,10 @@ const createVoteTask = async () => {
         client.onmessage = data => {
             const message = data.data.toString('utf-8')
             if(message === 'VOTE'){
-                voteSocket.push(client)
-                client.onclose = () => voteSocket.splice(voteSocket.indexOf(client), 1)
+                if(!voteSocket.includes(client)){
+                    voteSocket.push(client)
+                    client.onclose = () => voteSocket.splice(voteSocket.indexOf(client), 1)
+                }
             }else{
                 try{
                     const json = JSON.parse(message)
@@ -34,7 +36,7 @@ const alertSocket: WebSocket[] = []
 const createCheckFollowTask = () => {
     Web.instance.socket.on('connection', async client => {
         client.onmessage = data => {
-            if(data.data.toString('utf-8') === 'ALERT'){
+            if(data.data.toString('utf-8') === 'ALERT' && !alertSocket.includes(client)){
                 alertSocket.push(client)
                 client.onclose = () => alertSocket.splice(alertSocket.indexOf(client), 1)
             }
@@ -81,6 +83,7 @@ const createCheckFollowTask = () => {
     })
 }
 
+const songList: JSONData[] = [] // TODO: remove song & send song data
 const reqSongSocket: WebSocket[] = []
 const createRequestSongTask = async () => {
     Web.instance.socket.on('connection', client => {
@@ -88,9 +91,15 @@ const createRequestSongTask = async () => {
             try{
                 const message = data.toString('utf-8')
                 if(message === 'REQUEST_SONG'){
-                    reqSongSocket.push(client)
+                    if(!reqSongSocket.includes(client)){
+                        reqSongSocket.push(client)
+                        client.onclose = () => alertSocket.splice(alertSocket.indexOf(client), 1)
+                    }
                 }else if(isNumeric(message)){
-                    // TODO: remove song & send song data
+                    songList.splice(+message, 1)
+                    for(const client of reqSongSocket){
+                        client.send(JSON.stringify(songList))
+                    }
                 }
             }catch{}
         });
@@ -136,15 +145,12 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
     tray.on('double-click', () => window.show())
     const trayMenu = Menu.buildFromTemplate([
         {label: '종료', type: 'normal', click: () => {
-            let response = dialog.showMessageBoxSync(window, {
+            dialog.showMessageBoxSync(window, {
                 type: 'question',
                 buttons: ['예', '아니오'],
                 title: `치지직 도우미 종료`,
                 message: '치치직 도우미를 종료하시겠습니까?\n(프로그램이 켜져있어야 기능들이 동작합니다.)'
-            })
-            if(response !== 1){
-                window.destroy()
-            }
+            }) !== 1 && window.destroy()
         }}
     ]);
     tray.setContextMenu(trayMenu)
