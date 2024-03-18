@@ -188,7 +188,7 @@ app.whenReady().then(async () => {
 
     await window.loadURL(`https://chzzk.naver.com/`)
     if(await acquireAuthPhase(window.webContents.session)){
-        window.close()
+        window.destroy()
         return
     }
 
@@ -203,7 +203,7 @@ app.whenReady().then(async () => {
                     message: '로그인 도중 알 수 없는 문제가 발견되었습니다. 프로그램을 다시 실행해주세요.'
                 })
             }
-            window.close()
+            window.destroy()
         }
     })
     window.show()
