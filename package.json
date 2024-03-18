@@ -1,6 +1,6 @@
 {
   "name": "ChzzkHelper",
-  "version": "0.0.1-dev1",
+  "version": "0.0.1-dev2",
   "description": "치지직 도우미",
   "main": "build/main.js",
   "scripts": {
@@ -39,6 +39,8 @@
     "directories": {
       "output": "./pack/"
     },
-    "win": {}
+    "win": {
+      "icon": "./resources/icon.png"
+    }
   }
 }
