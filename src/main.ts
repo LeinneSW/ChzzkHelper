@@ -143,8 +143,7 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
                 message: '치치직 도우미를 종료하시겠습니까?\n(프로그램이 켜져있어야 기능들이 동작합니다.)'
             })
             if(response !== 1){
-                window.once('close', () => {})
-                window.close()
+                window.destroy()
             }
         }}
     ]);
