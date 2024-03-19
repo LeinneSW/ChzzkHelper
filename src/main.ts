@@ -8,8 +8,8 @@ import {JSONData, isNumeric, saveFile} from "./utils/utils";
 import {Web} from "./web/web";
 
 const voteSocket: WebSocket[] = []
-const createVoteTask = async () => {
-    Web.instance.socket.on('connection', async client => {
+const createVoteTask = () => {
+    Web.instance.socket.on('connection', client => {
         client.on('message', data => {
             const message = data.toString('utf-8')
             if(message === 'VOTE'){
@@ -43,7 +43,7 @@ const createVoteTask = async () => {
 let followList: string[] = []
 const alertSocket: WebSocket[] = []
 const createCheckFollowTask = () => {
-    Web.instance.socket.on('connection', async client => {
+    Web.instance.socket.on('connection', client => {
         client.on('message', data => {
             if(data.toString('utf-8') === 'ALERT' && !alertSocket.includes(client)){
                 alertSocket.push(client)
@@ -71,7 +71,7 @@ const createCheckFollowTask = () => {
             for(const user of await Chzzk.instance.getFollowerList(10000)){
                 list.push(user.user.userIdHash)
             }
-            saveFile(app.getPath('userData'), 'follow.txt', list.join('\n'))
+            await saveFile(app.getPath('userData'), 'follow.txt', list.join('\n'))
         }else{
             followList = (await readFile(filePath, 'utf-8')).split('\n').map(v => v.trim()).filter(v => !!v)
         }
@@ -94,8 +94,8 @@ const createCheckFollowTask = () => {
 
 const songList: JSONData[] = [] // TODO: remove song & send song data
 const reqSongSocket: WebSocket[] = []
-const createRequestSongTask = async () => {
-    Web.instance.socket.on('connection', async client => {
+const createRequestSongTask = () => {
+    Web.instance.socket.on('connection', client => {
         client.on('message', data => {
             try{
                 const message = data.toString('utf-8')
