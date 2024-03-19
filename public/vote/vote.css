@@ -43,3 +43,14 @@ body{
 #chatBox{
     margin-top: 20px;
 }
+
+#voteCountTitle{
+    height: 60px;
+    font-size: 28px;
+    font-weight: bold;
+    border-bottom: 2px solid #000;
+}
+
+.vote-participant{
+    font-size: 22px;
+}

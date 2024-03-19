@@ -30,7 +30,7 @@ const connect = () => {
                     if(!voteData[data.user.userIdHash]){
                         const userDiv = document.createElement('div')
                         userDiv.innerHTML = data.user.nickname
-                        userDiv.classList.add('text-center')
+                        userDiv.classList.add('text-center', 'vote-participant')
                         document.getElementById('userList').appendChild(userDiv)
                     }
                     voteData[data.user.userIdHash] = {
@@ -94,6 +94,7 @@ const updateCount = (elements) => {
     for(const index in elements){
         elements[index].innerHTML = (countVisible ? totalCount[index] : '?')+ '명'
     }
+    document.getElementById('voteCountTitle').innerHTML = `참여자 - ${totalCount.reduce((a, c) => a + c)}명`
 }
 
 const changeCountVisibility = (event) => {
@@ -103,6 +104,10 @@ const changeCountVisibility = (event) => {
 }
 
 const focusEvent = (event) => {
+    if(document.getElementById('startBtn').disabled){
+        return
+    }
+
     const temp = event.target.value
     if(temp){
         const list = document.querySelectorAll('ol > li > input')
@@ -118,4 +123,8 @@ const focusEvent = (event) => {
             span.onclick = (event) => {event.target.parentElement.remove()}
         }
     }
+}
+
+const onVoteInputClick = (event) => {
+    event.target.children[0]?.focus()
 }
