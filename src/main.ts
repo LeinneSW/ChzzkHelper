@@ -10,8 +10,8 @@ import {Web} from "./web/web";
 const voteSocket: WebSocket[] = []
 const createVoteTask = async () => {
     Web.instance.socket.on('connection', async client => {
-        client.onmessage = data => {
-            const message = data.data.toString('utf-8')
+        client.on('message', data => {
+            const message = data.toString('utf-8')
             if(message === 'VOTE'){
                 if(!voteSocket.includes(client)){
                     voteSocket.push(client)
@@ -27,6 +27,15 @@ const createVoteTask = async () => {
                     }
                 }catch{}
             }
+        })
+    })
+    Chzzk.instance.chat.on('chat', chat => {
+        const jsonData = JSON.stringify({
+            user: chat.profile,
+            message: chat.message,
+        })
+        for(const client of voteSocket){
+            client.send(jsonData)
         }
     })
 }
@@ -35,12 +44,12 @@ let followList: string[] = []
 const alertSocket: WebSocket[] = []
 const createCheckFollowTask = () => {
     Web.instance.socket.on('connection', async client => {
-        client.onmessage = data => {
-            if(data.data.toString('utf-8') === 'ALERT' && !alertSocket.includes(client)){
+        client.on('message', data => {
+            if(data.toString('utf-8') === 'ALERT' && !alertSocket.includes(client)){
                 alertSocket.push(client)
                 client.onclose = () => alertSocket.splice(alertSocket.indexOf(client), 1)
             }
-        }
+        })
     })
     Web.instance.app.post('/req/test_alert', (_, res) => {
         res.sendStatus(200)
@@ -86,8 +95,8 @@ const createCheckFollowTask = () => {
 const songList: JSONData[] = [] // TODO: remove song & send song data
 const reqSongSocket: WebSocket[] = []
 const createRequestSongTask = async () => {
-    Web.instance.socket.on('connection', client => {
-        client.on('message', (data) => {
+    Web.instance.socket.on('connection', async client => {
+        client.on('message', data => {
             try{
                 const message = data.toString('utf-8')
                 if(message === 'REQUEST_SONG'){
@@ -121,14 +130,6 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
     createVoteTask()
     createCheckFollowTask()
     createRequestSongTask()
-    Chzzk.instance.chat.on('chat', chat => {
-        for(const client of voteSocket){
-            client.send(JSON.stringify({
-                user: chat.profile,
-                message: chat.message,
-            }))
-        }
-    })
     
     const icon = path.join(__dirname, '../resources/icon.png')
     const window = new BrowserWindow({
