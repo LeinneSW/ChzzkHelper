@@ -18,15 +18,14 @@ const showAlert = (data) => {
     document.getElementById('type').innerHTML = makeStrWithPulse(data.type || '팔로우')
     document.getElementById('nickname').innerHTML = makeStrWithPulse(data.user?.nickname)
     try{
-        new Audio('./follow.mp3').play()
+        new Audio('./data/follow.mp3').play()
     }catch(e){}
 
-    profile.src = data.user?.profileImageUrl || './profile_default.png'
+    profile.src = data.user?.profileImageUrl || './data/profile_default.png'
     profile.onload = () => {
         const element = document.getElementsByTagName('body')[0]
         element.classList.add('fadeIn')
         element.classList.remove('hidden')
-    
         setTimeout(() => {
             element.classList.add('fadeOut')
             setTimeout(async () => {
