@@ -1,0 +1,46 @@
+body, html{
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0);
+}
+
+body{
+    display: flex;
+    text-align: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.fadeIn{
+    animation: fadein 1s;
+}
+
+.fadeOut{
+    animation: fadeout 1.1s;
+}
+
+.error{
+    height: 100%;
+    font-size: 70px;
+    font-weight: bold;
+    background: rgb(252, 113, 113);
+}
+
+@keyframes fadein{
+    from{
+        opacity: 0;
+    }
+    to{
+        opacity: 1;
+    }
+}
+@keyframes fadeout{
+    from{
+        opacity: 1;
+    }
+    to{
+        opacity: 0;
+    }
+}

@@ -9,26 +9,24 @@ import {Web} from "./web/web";
 
 const voteSocket: WebSocket[] = []
 const createVoteTask = () => {
-    Web.instance.socket.on('connection', client => {
-        client.on('message', data => {
-            const message = data.toString('utf-8')
-            if(message === 'VOTE'){
-                if(!voteSocket.includes(client)){
-                    voteSocket.push(client)
-                    client.onclose = () => voteSocket.splice(voteSocket.indexOf(client), 1)
-                }
-            }else{
-                try{
-                    const json = JSON.parse(message)
-                    switch(json.type){
-                        case 'SEND_MESSAGE':
-                            json.message && Chzzk.instance.chat.sendChat(json.message)
-                            break;
-                    }
-                }catch{}
+    Web.instance.socket.on('connection', client => client.on('message', data => {
+        const message = data.toString('utf-8')
+        if(message === 'VOTE' && !voteSocket.includes(client)){
+            voteSocket.push(client)
+            client.onclose = () => voteSocket.splice(voteSocket.indexOf(client), 1)
+            return
+        }
+
+        try{
+            const json = JSON.parse(message)
+            switch(json.type){
+                case 'SEND_MESSAGE':
+                    json.message && Chzzk.instance.chat.sendChat(json.message)
+                    break;
             }
-        })
-    })
+            return
+        }catch{}
+    }))
     Chzzk.instance.chat.on('chat', chat => {
         const jsonData = JSON.stringify({
             user: chat.profile,
@@ -37,7 +35,20 @@ const createVoteTask = () => {
         for(const client of voteSocket){
             client.send(jsonData)
         }
+        for(const client of emojiSocket){
+            client.send(JSON.stringify(chat))
+        }
     })
+}
+
+const emojiSocket: WebSocket[] = []
+const createEmojiTask = () => {
+    Web.instance.socket.on('connection', client => client.on('message', data => {
+        if(data.toString('utf-8') === 'SHOW_EMOJI' && !emojiSocket.includes(client)){
+            emojiSocket.push(client)
+            client.on('close', () => emojiSocket.splice(emojiSocket.indexOf(client), 1))
+        }
+    }))
 }
 
 let followList: string[] = []
@@ -128,6 +139,7 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
     }
 
     createVoteTask()
+    createEmojiTask()
     createCheckFollowTask()
     createRequestSongTask()
     
