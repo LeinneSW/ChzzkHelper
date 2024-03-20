@@ -172,14 +172,14 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
     ]);
     tray.setContextMenu(trayMenu)
 
-    window.once('close', event => {
+    window.on('close', event => {
+        event.preventDefault()
         dialog.showMessageBoxSync(window, {
             type: 'info',
             title: `트레이로 최소화`,
             message: '도우미는 종료되지않고 트레이로 최소화됩니다.\n(프로그램이 켜져있어야 기능들이 동작합니다.)'
         })
         window.hide()
-        event.preventDefault()
     })
     await window.loadFile(path.join(__dirname, '../public/index.html'))
     window.show()
