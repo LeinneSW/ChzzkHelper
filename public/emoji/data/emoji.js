@@ -1,31 +1,24 @@
-let client
+let body, client
 
 const random = (value, size = 112) => Math.random() * (value - size)
 
-const showEmoji = (data) => {
-    const body = document.getElementsByTagName('body')[0]
-    const rect = body.getBoundingClientRect()
+const showEmoji = (width, height, emojiUrl) => {
+    const emoji = document.createElement('img')
+    emoji.classList.add('fadeIn')
+    emoji.style.position = 'absolute'
+    emoji.style.left = random(width) + 'px'
+    emoji.style.top = random(height) + 'px'
 
-    const emojis = data.extras?.emojis || []
-    for(const name in emojis){
-        const profile = document.createElement('img')
-        profile.style.position = 'absolute'
-        profile.style.left = random(rect.width) + 'px'
-        profile.style.top = random(rect.height) + 'px'
-
-        profile.classList.add('fadeIn')
-        profile.src = emojis[name].split(`?`)[0]
-        profile.onload = () => setTimeout(() => {
-            profile.classList.add('fadeOut')
-            setTimeout(() => profile.remove(), 998)
-        }, 2000)
-        profile.onerror = () => profile.remove()
-        body.appendChild(profile)
-    }
+    emoji.src = emojiUrl.split(`?`)[0]
+    emoji.onload = () => setTimeout(() => {
+        emoji.classList.add('fadeOut')
+        setTimeout(() => emoji.remove(), 998)
+    }, 3000)
+    emoji.onerror = () => emoji.remove()
+    body.appendChild(emoji)
 }
 
 const checkError = () => {
-    const body = document.getElementsByTagName('body')[0]
     if(client?.readyState === WebSocket.OPEN){
         body.innerHTML = ''
         body.classList.remove('error')
@@ -36,6 +29,7 @@ const checkError = () => {
 }
 
 const connect = () => {
+    body = document.getElementsByTagName('body')[0]
     if(client?.readyState === WebSocket.OPEN){
         return
     }
@@ -48,7 +42,21 @@ const connect = () => {
     }
     client.onmessage = (e) => {
         try{
-            showEmoji(JSON.parse(e.data.toString()))
+            const data = JSON.parse(e.data.toString())
+            const emojiReg = data.message.match(/{:[\w]*:}/g)
+            if(!emojiReg){
+                console.log('data.message', data.message)
+                console.log('data.emojiList', data.emojiList)
+                return
+            }
+            console.log('emojiText', emojiReg)
+
+            const rect = document.getElementsByTagName('body')[0].getBoundingClientRect()
+            for(let i = 0; i < emojiReg.length; ++i){
+                const emojiName = emojiReg[i].substring(2, emojiReg[i].length - 2)
+                const emojiUrl = data.emojiList[emojiName]
+                showEmoji(rect.width, rect.height, emojiUrl)
+            }
         }catch{}
     }
     client.onclose = () => {
