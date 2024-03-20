@@ -2,9 +2,32 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>치지직 이모티콘</title>
+    <title>이모티콘 오버레이</title>
+    <script>
+        const copy = () => {
+            navigator.clipboard.writeText(`http://127.0.0.1:54321/alert/`)
+            .then(() => alert('복사 완료'))
+            .catch(() => alert('복사 실패'))
+        }
+    </script>
 </head>
 <body>
-    <h1>준비중입니다.</h1>
+    <h1>이모티콘 오버레이 사용방법</h1>
+    <hr>
+    <div style="display: flex;">
+        <div style="flex: 1">
+            <h3>1. OBS 브라우저 소스 추가하기</h3>
+            <img src="./img/obs1.png">
+        </div>
+        <div style="flex: 1">
+            <h3>2. 아래 주소 복사한 후 붙여넣기</h3>
+            <span style="color: rgb(57, 57, 209)">http://127.0.0.1:54321/emoji/</span>
+            <button onclick="copy()">복사하기</button><br>
+            <img src="./img/obs2.png">
+        </div>
+        <div style="flex: 1">
+            <h3>3. 채팅창에 이모티콘을 입력하여 잘 뜨는지 확인하기</h3>
+        </div>
+    </div>
 </body>
 </html>
