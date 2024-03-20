@@ -35,9 +35,6 @@ const createVoteTask = () => {
         for(const client of voteSocket){
             client.send(jsonData)
         }
-        for(const client of emojiSocket){
-            client.send(JSON.stringify(chat))
-        }
     })
 }
 
@@ -49,6 +46,15 @@ const createEmojiTask = () => {
             client.on('close', () => emojiSocket.splice(emojiSocket.indexOf(client), 1))
         }
     }))
+    Chzzk.instance.chat.on('chat', chat => {
+        const jsonData = JSON.stringify({
+            message: chat.message,
+            emojiList: chat.extras?.emojis || {},
+        })
+        for(const client of emojiSocket){
+            client.send(jsonData)
+        }
+    })
 }
 
 let followList: string[] = []
@@ -180,7 +186,7 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
             message: '도우미는 종료되지않고 트레이로 최소화됩니다.\n(프로그램이 켜져있어야 기능들이 동작합니다.)'
         })
         window.hide()
-    })
+            })
     await window.loadFile(path.join(__dirname, '../public/index.html'))
     window.show()
     return true
