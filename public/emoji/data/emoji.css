@@ -10,7 +10,7 @@ body{
     display: flex;
     text-align: center;
     align-items: center;
-    flex-direction: column;
+    justify-content: center;
 }
 
 .fadeIn{
