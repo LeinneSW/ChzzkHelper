@@ -1,6 +1,7 @@
 let body, client
+const imgSize = 150
 
-const random = (value, size = 112) => Math.random() * (value - size)
+const random = (value) => Math.random() * (value - imgSize)
 
 const showEmoji = (width, height, emojiUrl) => {
     const emoji = document.createElement('img')
@@ -8,6 +9,9 @@ const showEmoji = (width, height, emojiUrl) => {
     emoji.style.position = 'absolute'
     emoji.style.left = random(width) + 'px'
     emoji.style.top = random(height) + 'px'
+
+    emoji.style.width = imgSize + 'px'
+    emoji.style.height = imgSize + 'px'
 
     emoji.src = emojiUrl.split(`?`)[0]
     emoji.onload = () => setTimeout(() => {
