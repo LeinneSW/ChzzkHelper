@@ -1,6 +1,7 @@
-import {mkdir, writeFile} from "fs/promises";
+import {mkdir, readFile, writeFile} from "fs/promises";
 import fsExists from "fs.promises.exists";
 import path from "path";
+import {app} from "electron";
 
 export interface JSONData{
     [key: string | number]: any;
@@ -27,9 +28,14 @@ export const dateToString = (dateData: string | number | Date, full: boolean = f
     return output;
 }
 
-export const saveFile = async (dir: string, fileName: string, data: JSONData | string): Promise<void> => {
+export const getResourcePath = (fileOrDir: string = '') => path.join(app.getPath('userData'), fileOrDir)
+
+export const readResource = (fileName: string): Promise<string> => readFile(getResourcePath(fileName), 'utf-8')
+
+export const saveResource = async (fileName: string, data: JSONData | string, dir: string = '') => {
+    dir = getResourcePath(dir)
     if(!await fsExists(dir)){
-        await mkdir(dir, {recursive: true});
+        await mkdir(dir, {recursive: true})
     }
-    await writeFile(path.join(dir, fileName), typeof data === 'string' ? data : JSON.stringify(data, null, 4), 'utf-8');
+    await writeFile(path.join(dir, fileName), typeof data === 'string' ? data : JSON.stringify(data, null, 4), 'utf-8')
 }

@@ -4,7 +4,7 @@ import path from 'path'
 import {Chzzk} from "./chzzk/chzzk";
 import fsExists from "fs.promises.exists";
 import {readFile} from "fs/promises";
-import {JSONData, isNumeric, saveFile} from "./utils/utils";
+import {JSONData, getResourcePath, isNumeric, saveResource} from "./utils/utils";
 import {Web} from "./web/web";
 
 const voteSocket: WebSocket[] = []
@@ -81,14 +81,14 @@ const createCheckFollowTask = () => {
         }
     })
 
-    const filePath = path.join(app.getPath('userData'), 'follow.txt')
+    const filePath = getResourcePath('follow.txt')
     fsExists(filePath).then(async v => {
         if(!v){
             const list = [];
             for(const user of await Chzzk.instance.getFollowerList(10000)){
                 list.push(user.user.userIdHash)
             }
-            await saveFile(app.getPath('userData'), 'follow.txt', list.join('\n'))
+            await saveResource('follow.txt', list.join('\n'))
         }else{
             followList = (await readFile(filePath, 'utf-8')).split('\n').map(v => v.trim()).filter(v => !!v)
         }
@@ -103,7 +103,7 @@ const createCheckFollowTask = () => {
                         client.send(json)
                     }
                 }
-                saveFile(app.getPath('userData'), 'follow.txt', followList.join('\n'))
+                await saveResource('follow.txt', followList.join('\n'))
             }
         }, 10000)
     })
