@@ -7,6 +7,27 @@ import {readFile} from "fs/promises";
 import {JSONData, getResourcePath, isNumeric, saveResource} from "./utils/utils";
 import {Web} from "./web/web";
 
+const ttsSocket: WebSocket[] = []
+const createTTSTask = () => {
+    Web.instance.socket.on('connection', client => client.on('message', data => {
+        const message = data.toString('utf-8')
+        if(message === 'TTS' && !ttsSocket.includes(client)){
+            ttsSocket.push(client)
+            client.onclose = () => ttsSocket.splice(ttsSocket.indexOf(client), 1)
+            return
+        }
+    }))
+    Chzzk.instance.chat.on('chat', chat => {
+        const jsonData = JSON.stringify({
+            user: chat.profile,
+            message: chat.message,
+        })
+        for(const client of ttsSocket){
+            client.send(jsonData)
+        }
+    })
+}
+
 const voteSocket: WebSocket[] = []
 const createVoteTask = () => {
     Web.instance.socket.on('connection', client => client.on('message', data => {
@@ -144,6 +165,7 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
         return false
     }
 
+    createTTSTask()
     createVoteTask()
     createEmojiTask()
     createCheckFollowTask()
