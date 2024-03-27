@@ -4,7 +4,7 @@ import path from 'path'
 import {Chzzk} from "./chzzk/chzzk";
 import fsExists from "fs.promises.exists";
 import {readFile} from "fs/promises";
-import {JSONData, getResourcePath, isNumeric, saveResource} from "./utils/utils";
+import {getResourcePath, saveResource} from "./utils/utils";
 import {Web} from "./web/web";
 
 const ttsSocket: WebSocket[] = []
@@ -130,34 +130,6 @@ const createCheckFollowTask = () => {
     })
 }
 
-const songList: JSONData[] = [] // TODO: remove song & send song data
-const reqSongSocket: WebSocket[] = []
-const createRequestSongTask = () => {
-    Web.instance.socket.on('connection', client => {
-        client.on('message', data => {
-            try{
-                const message = data.toString('utf-8')
-                if(message === 'REQUEST_SONG'){
-                    if(!reqSongSocket.includes(client)){
-                        reqSongSocket.push(client)
-                        client.onclose = () => alertSocket.splice(alertSocket.indexOf(client), 1)
-                    }
-                }else if(isNumeric(message)){
-                    const index = parseInt(message)
-                    if(0 <= index && index < songList.length){
-                        songList.splice(index, 1)
-                        const jsonTest = JSON.stringify(songList)
-                        for(const client of reqSongSocket){
-                            client.send(jsonTest)
-                        }
-                    }
-                }
-            }catch{}
-        });
-        client.on('close', () => reqSongSocket.splice(reqSongSocket.indexOf(client), 1));
-    })
-}
-
 const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => {
     const nidAuth = (await session.cookies.get({name: 'NID_AUT'}))[0]?.value || ''
     const nidSession = (await session.cookies.get({name: 'NID_SES'}))[0]?.value || ''
@@ -169,7 +141,6 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
     createVoteTask()
     createEmojiTask()
     createCheckFollowTask()
-    createRequestSongTask()
     
     const icon = path.join(__dirname, '../resources/icon.png')
     const window = new BrowserWindow({
