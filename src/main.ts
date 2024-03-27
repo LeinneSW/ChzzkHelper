@@ -197,6 +197,7 @@ app.whenReady().then(async () => {
         width: 800,
         height: 600,
         show: false,
+        resizable: false,
         webPreferences: {
             nodeIntegration: true,
             defaultEncoding: 'utf-8',
