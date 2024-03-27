@@ -2,53 +2,6 @@ let client
 let voteData = {}
 let countVisible = true
 
-const connect = () => {
-    if(client?.readyState === WebSocket.OPEN){
-        return
-    }
-
-    client?.close()
-    client = new WebSocket(`ws://${location.host || `127.0.0.1:54321`}/ws`)
-    client.onopen = () => client.send('VOTE')
-    client.onmessage = (e) => {
-        try{
-            const data = JSON.parse(e.data.toString())
-
-            const chat = document.createElement('div')
-            chat.style = 'margin: 0 20px'
-            chat.innerHTML = data.user.nickname + ': ' + data.message
-            document.getElementById('chatBox').appendChild(chat)
-            
-            if(!document.getElementById('startBtn').disabled || document.getElementById('endBtn').disabled){
-                return
-            }
-
-            if(data.message.startsWith('!투표')){
-                const index = parseInt(data.message.split(' ')[1] || '')
-                const elements = document.querySelectorAll('ol > li > span')
-                if(!isNaN(index) && 0 < index && index <= elements.length){
-                    if(!voteData[data.user.userIdHash]){
-                        const userDiv = document.createElement('div')
-                        userDiv.innerHTML = data.user.nickname
-                        userDiv.classList.add('text-center', 'vote-participant')
-                        document.getElementById('userList').appendChild(userDiv)
-                    }
-                    voteData[data.user.userIdHash] = {
-                        user: data.user,
-                        index: index - 1
-                    };
-                }else{
-                    return
-                }
-                updateCount(elements)
-            }
-        }catch(e){
-            console.log(e)
-        }
-    }
-    client.onclose = () => setTimeout(() => connect(), 1000)
-}
-
 const startVote = (event) => {
     if(event.target.disabled){
         return
@@ -127,4 +80,51 @@ const focusEvent = (event) => {
 
 const onVoteInputClick = (event) => {
     event.target.children[0]?.focus()
+}
+
+const connect = () => {
+    if(client?.readyState === WebSocket.OPEN){
+        return
+    }
+
+    client?.close()
+    client = new WebSocket(`ws://${window.localStorage.getItem('wsURL') || location.host || `127.0.0.1:54321`}/ws`)
+    client.onopen = () => client.send('VOTE')
+    client.onmessage = (e) => {
+        try{
+            const data = JSON.parse(e.data.toString())
+
+            const chat = document.createElement('div')
+            chat.style = 'margin: 0 20px'
+            chat.innerHTML = data.user.nickname + ': ' + data.message
+            document.getElementById('chatBox').appendChild(chat)
+            
+            if(!document.getElementById('startBtn').disabled || document.getElementById('endBtn').disabled){
+                return
+            }
+
+            if(data.message.startsWith('!투표')){
+                const index = parseInt(data.message.split(' ')[1] || '')
+                const elements = document.querySelectorAll('ol > li > span')
+                if(!isNaN(index) && 0 < index && index <= elements.length){
+                    if(!voteData[data.user.userIdHash]){
+                        const userDiv = document.createElement('div')
+                        userDiv.innerHTML = data.user.nickname
+                        userDiv.classList.add('text-center', 'vote-participant')
+                        document.getElementById('userList').appendChild(userDiv)
+                    }
+                    voteData[data.user.userIdHash] = {
+                        user: data.user,
+                        index: index - 1
+                    };
+                }else{
+                    return
+                }
+                updateCount(elements)
+            }
+        }catch(e){
+            console.log(e)
+        }
+    }
+    client.onclose = () => setTimeout(() => connect(), 1000)
 }

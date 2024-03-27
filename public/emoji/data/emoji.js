@@ -39,7 +39,7 @@ const connect = () => {
     }
 
     client?.close()
-    client = new WebSocket(`ws://${location.host || `127.0.0.1:54321`}/ws`)
+    client = new WebSocket(`ws://${window.localStorage.getItem('wsURL') || location.host || '127.0.0.1:54321'}/ws`)
     client.onopen = () => {
         checkError()
         client.send('SHOW_EMOJI')

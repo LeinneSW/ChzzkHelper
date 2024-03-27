@@ -1,5 +1,4 @@
-let client
-let wsURL, ttsURL
+let ttsURL, client
 const playList = [] // Audio[]
 
 const findRepeatedText = (str) => {
@@ -35,7 +34,7 @@ const connect = () => {
     if(client?.readyState === WebSocket.OPEN){
         return;
     }
-    client = new WebSocket(`ws://${wsURL}/ws`)
+    client = new WebSocket(`ws://${window.localStorage.getItem('wsURL') || location.host || '127.0.0.1:54321'}/ws`)
     client.onopen = () => client.send(`TTS`)
     client.onmessage = e => {
         try{
@@ -58,9 +57,7 @@ const connect = () => {
 
 function init(){
     const storage = window.localStorage
-    wsURL = storage.getItem('wsURL') || '127.0.0.1:54321'
-
-    ttsURL = storage.getItem('ttsURL');
+    ttsURL = storage.getItem('ttsURL')
     while(!ttsURL){
         ttsURL = prompt('사용하실 TTS 엔진 URL을 입력해주세요.')
         !ttsURL || storage.setItem('ttsURL', ttsURL)
