@@ -20,16 +20,15 @@ const findRepeatedText = (str) => {
 const playTTS = (text) => {
     const sound = new Audio(ttsURL.replaceAll('${text}', encodeURIComponent(text)))
     sound.onended = () => {
-        console.log('재생완료:', text)
         playList.splice(playList.indexOf(sound), 1);
         if(playList.length > 0){
             playList[0].play()
         }
     }
-    playList.push(sound);
-    if(playList.length === 1){
+    if(playList.length === 0){
         sound.play()
     }
+    playList.push(sound)
 }
 
 const connect = () => {
