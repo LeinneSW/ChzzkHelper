@@ -22,7 +22,6 @@ export class Web{
             throw new Error('Web instance는 한개만 존재해야합니다.')   
         }
 
-        Web._instance = this
         this.app = express()
         this.app.use('/', express.static(path.join(__dirname , './../../public/')))
 
