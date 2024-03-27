@@ -189,26 +189,33 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
     tray.setToolTip('치지직 도우미')
     tray.on('double-click', () => window.show())
     const trayMenu = Menu.buildFromTemplate([
-        {label: '종료', type: 'normal', click: () => {
+        {label: '설정', type: 'normal', click: () => {
             dialog.showMessageBoxSync(window, {
-                type: 'question',
-                buttons: ['예', '아니오'],
-                title: `치지직 도우미 종료`,
-                message: '치치직 도우미를 종료하시겠습니까?\n(프로그램이 켜져있어야 기능들이 동작합니다.)'
-            }) !== 1 && window.destroy()
-        }}
+                type: 'info',
+                title: `준비중인 기능`,
+                message: '아직 구현되지 않은 기능입니다.'
+            })
+        }},
+        {label: '프로그램 종료', type: 'normal', click: () => window.destroy()},
     ]);
     tray.setContextMenu(trayMenu)
 
     window.on('close', event => {
-        event.preventDefault()
-        dialog.showMessageBoxSync(window, {
-            type: 'info',
-            title: `트레이로 최소화`,
-            message: '도우미는 종료되지않고 트레이로 최소화됩니다.\n(프로그램이 켜져있어야 기능들이 동작합니다.)'
+        const response = dialog.showMessageBoxSync(window, {
+            type: 'question',
+            buttons: ['아니오', '트레이로 이동', '프로그램 종료'],
+            title: `치지직 도우미 종료`,
+            message: '치치직 도우미를 종료하시겠습니까?\n(OBS에 추가한 브라우저 위젯들은 도우미가 켜져있어야 동작합니다.)'
         })
-        window.hide()
-            })
+        
+        switch(response){
+            case 1:
+                window.hide()
+            case 0:
+                event.preventDefault()
+                break;
+        }
+    })
     await window.loadFile(path.join(__dirname, '../public/index.html'))
     window.show()
     return true
