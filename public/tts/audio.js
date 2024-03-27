@@ -25,10 +25,10 @@ const playTTS = (text) => {
             playList[0].play()
         }
     }
-    if(playList.length === 0){
+    playList.push(sound)
+    if(playList.length === 1){
         sound.play()
     }
-    playList.push(sound)
 }
 
 const connect = () => {
