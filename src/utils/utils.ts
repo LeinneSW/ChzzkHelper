@@ -11,13 +11,9 @@ export const delay = (value: number) => new Promise((res, _) => setTimeout(res, 
 export const isObject = (data: any): boolean => !!data && typeof data === 'object';
 export const isArray = (data: any): boolean => isObject(data) && data.constructor === Array;
 export const isNumeric = (data: any): boolean => {
-    if(typeof data !== 'number'){
-        data = parseInt(data);
-    }
+    typeof data === 'number' || (data = parseInt(data))
     return !isNaN(data) && isFinite(data);
 }
-
-export const randomInt = (length: number) => `${Math.floor(Math.random() * +(1 + '0'.repeat(length)))}`.padEnd(length, '0')
 
 export const dateToString = (dateData: string | number | Date, full: boolean = false): string => {
     const date = typeof dateData !== 'object' ? new Date(dateData || 0) : dateData;
@@ -28,11 +24,11 @@ export const dateToString = (dateData: string | number | Date, full: boolean = f
     return output;
 }
 
-export const getResourcePath = (fileOrDir: string = '') => path.join(app.getPath('userData'), fileOrDir)
+export const getResourcePath = (fileOrDir: string = ''): string => path.join(app.getPath('userData'), fileOrDir)
 
 export const readResource = (fileName: string): Promise<string> => readFile(getResourcePath(fileName), 'utf-8')
 
-export const saveResource = async (fileName: string, data: JSONData | string, dir: string = '') => {
+export const saveResource = async (fileName: string, data: JSONData | string, dir: string = ''): Promise<void> => {
     dir = getResourcePath(dir)
     if(!await fsExists(dir)){
         await mkdir(dir, {recursive: true})
