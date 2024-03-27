@@ -2,9 +2,7 @@ import {app, BrowserWindow, Tray, dialog, Menu} from "electron";
 import {WebSocket} from 'ws'
 import path from 'path'
 import {Chzzk} from "./chzzk/chzzk";
-import fsExists from "fs.promises.exists";
-import {readFile} from "fs/promises";
-import {getResourcePath, saveResource} from "./utils/utils";
+import {readResource, saveResource} from "./utils/utils";
 import {Web} from "./web/web";
 
 const ttsSocket: WebSocket[] = []
@@ -102,32 +100,30 @@ const createCheckFollowTask = () => {
         }
     })
 
-    const filePath = getResourcePath('follow.txt')
-    fsExists(filePath).then(async v => {
-        if(!v){
-            const list = [];
-            for(const user of await Chzzk.instance.getFollowerList(10000)){
-                list.push(user.user.userIdHash)
-            }
-            await saveResource('follow.txt', list.join('\n'))
-        }else{
-            followList = (await readFile(filePath, 'utf-8')).split('\n').map(v => v.trim()).filter(v => !!v)
+    readResource(`follow.txt`).then(file => {
+        for(let data of file.split('\n')){
+            data = data.trim().replace(/\s/g, '')
+            data && followList.push(data)
         }
-    }).then(() => {
-        setInterval(async () => {
-            const newData = (await Chzzk.instance.getFollowerList(10)).filter(user => !followList.includes(user.user.userIdHash))
-            if(newData.length > 0){
-                for(const followData of newData){
-                    followList.push(followData.user.userIdHash)
-                    const json = JSON.stringify({type: '팔로우', user: followData.user});
-                    for(const client of alertSocket){
-                        client.send(json)
-                    }
+    }).catch(async () => {
+        const list = [];
+        for(const user of await Chzzk.instance.getFollowerList(10000)){
+            list.push(user.user.userIdHash)
+        }
+        await saveResource('follow.txt', list.join('\n'))
+    }).then(() => setInterval(async () => {
+        const newData = (await Chzzk.instance.getFollowerList(10)).filter(user => !followList.includes(user.user.userIdHash))
+        if(newData.length > 0){
+            for(const followData of newData){
+                followList.push(followData.user.userIdHash)
+                const json = JSON.stringify({type: '팔로우', user: followData.user});
+                for(const client of alertSocket){
+                    client.send(json)
                 }
-                await saveResource('follow.txt', followList.join('\n'))
             }
-        }, 10000)
-    })
+            await saveResource('follow.txt', followList.join('\n'))
+        }
+    }, 10000))
 }
 
 const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => {
