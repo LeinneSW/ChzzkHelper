@@ -24,7 +24,7 @@ export const dateToString = (dateData: string | number | Date, full: boolean = f
     return output;
 }
 
-export const getResourcePath = (fileOrDir: string = ''): string => path.join(app.getPath('userData'), fileOrDir)
+export const getResourcePath = (fileOrDir: string = ''): string => path.join(app.getPath('userData'), 'resources', fileOrDir)
 
 export const readResource = (fileName: string): Promise<string> => readFile(getResourcePath(fileName), 'utf-8')
 
