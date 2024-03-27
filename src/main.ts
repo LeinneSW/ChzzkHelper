@@ -153,8 +153,8 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
             defaultEncoding: 'utf-8',
         },
         minimizable: false,
-        autoHideMenuBar: true,
     })
+    window.setMenu(null)
 
     const tray = new Tray(icon)
     tray.setToolTip('치지직 도우미')
@@ -201,9 +201,9 @@ app.whenReady().then(async () => {
             nodeIntegration: true,
             defaultEncoding: 'utf-8',
         },
-        autoHideMenuBar: true,
         icon: path.join(__dirname, '../resources/icon.png')
     })
+    window.setMenu(null)
 
     await window.loadURL(`https://chzzk.naver.com/`)
     if(await acquireAuthPhase(window.webContents.session)){
