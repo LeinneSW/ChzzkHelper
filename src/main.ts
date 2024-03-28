@@ -59,6 +59,16 @@ const createVoteTask = () => {
 
 const emojiSocket: WebSocket[] = []
 const createEmojiTask = () => {
+    Web.instance.app.post('/req/test_emoji', (req, res) => {
+        res.sendStatus(200)
+        const jsonData = JSON.stringify({
+            message: '{:d_47:}'.repeat(5),
+            emojiList: {'d_47': 'https://ssl.pstatic.net/static/nng/glive/icon/b_07.gif'},
+        })
+        for(const client of emojiSocket){
+            client.send(jsonData)
+        }
+    })
     Web.instance.socket.on('connection', client => client.on('message', data => {
         if(data.toString('utf-8') === 'SHOW_EMOJI' && !emojiSocket.includes(client)){
             emojiSocket.push(client)

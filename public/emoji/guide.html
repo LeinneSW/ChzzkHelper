@@ -9,6 +9,10 @@
             .then(() => alert('복사 완료'))
             .catch(() => alert('복사 실패'))
         }
+        
+        const test = () => {
+            fetch(`http://127.0.0.1:54321/req/test_emoji`, {method: 'post'})
+        }
     </script>
 </head>
 <body>
@@ -28,6 +32,7 @@
         </div>
         <div style="flex: 1">
             <h3>3. 채팅창에 이모티콘을 입력하여 잘 뜨는지 확인하기</h3>
+            <button onclick="test()">테스트 이모티콘 보내기</button>
         </div>
     </div>
 </body>
