@@ -1,7 +1,7 @@
-let body, client
-const imgSize = 150
+let client
+let body, sizeSlider, timeSlider
 
-const random = (value) => Math.random() * (value - imgSize)
+const random = (value) => Math.random() * (value - sizeSlider.value)
 
 const showEmoji = (width, height, emojiUrl) => {
     const emoji = document.createElement('img')
@@ -10,30 +10,30 @@ const showEmoji = (width, height, emojiUrl) => {
     emoji.style.left = random(width) + 'px'
     emoji.style.top = random(height) + 'px'
 
-    emoji.style.width = imgSize + 'px'
-    emoji.style.height = imgSize + 'px'
+    emoji.style.width = sizeSlider.value + 'px'
+    emoji.style.height = sizeSlider.value + 'px'
 
     emoji.src = emojiUrl.split(`?`)[0]
     emoji.onload = () => setTimeout(() => {
         emoji.classList.add('fadeOut')
         setTimeout(() => emoji.remove(), 998)
-    }, 3000)
+    }, timeSlider.value * 1000)
     emoji.onerror = () => emoji.remove()
     body.appendChild(emoji)
 }
 
 const checkError = () => {
     if(client?.readyState === WebSocket.OPEN){
-        body.innerHTML = ''
+        body.children[0].innerText = ''
+        //body.innerHTML = ''
         body.classList.remove('error')
     }else{
-        body.innerText = '치지직 도우미가 꺼져있습니다'
+        body.children[0].innerText = '치지직 도우미가 꺼져있습니다'
         body.classList.add('error')
     }
 }
 
 const connect = () => {
-    body = document.getElementsByTagName('body')[0]
     if(client?.readyState === WebSocket.OPEN){
         return
     }
@@ -67,4 +67,31 @@ const connect = () => {
         checkError()
         setTimeout(() => connect(), 1000)
     }
+}
+
+const init = () => {
+    body = document.getElementsByTagName('body')[0]
+    sizeSlider = document.getElementById('sizeSlider')
+    timeSlider = document.getElementById('timeSlider')
+
+    const settings = document.getElementById('settings')
+    body.addEventListener('mouseenter', () => settings.classList.add('show'))
+    body.addEventListener('mouseleave', () => settings.classList.remove('show'))
+
+    const sizeSliderValue = document.getElementById('sizeSliderValue')
+    sizeSlider.value = localStorage.getItem('imgSize') || 150
+    sizeSliderValue.textContent = sizeSlider.value + 'px'
+    sizeSlider.addEventListener('input', () => {
+        sizeSliderValue.textContent = sizeSlider.value + 'px';
+        localStorage.setItem('imgSize', sizeSlider.value);
+    })
+
+    const timeSliderValue = document.getElementById('timeSliderValue')
+    timeSlider.value = localStorage.getItem('remainTime') || 3
+    timeSliderValue.textContent = timeSlider.value + '초'
+    timeSlider.addEventListener('input', () => {
+        timeSliderValue.textContent = timeSlider.value + '초';
+        localStorage.setItem('remainTime', timeSlider.value);
+    })
+    connect()
 }

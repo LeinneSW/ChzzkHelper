@@ -1,5 +1,6 @@
 body, html{
     margin: 0;
+    padding: 0;
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -43,4 +44,83 @@ body{
     to{
         opacity: 0;
     }
+}
+
+/** Slider CSS */
+.settings-title{
+    font-size: 22px;
+    font-weight: bold;
+
+    padding-bottom: 7px;
+}
+
+.settings{
+    z-index: 9999;
+    display: none;
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    width: 320px;
+    background-color: #f9f9f9;
+    border: 3px solid #beff80;
+    border-radius: 9px;
+    padding: 10px;
+}
+
+.settings.show{
+    display: block;
+}
+
+.slider-container{
+    display: flex;
+    align-items: center;
+}
+
+.slider{
+    flex: 1;
+    height: 8px;
+    border-radius: 4px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.slider:hover{
+    opacity: 1;
+}
+
+.slider::-webkit-slider-thumb{
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+    
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.slider::-moz-range-thumb{
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #4CAF50;
+    cursor: pointer;
+}
+
+.left{
+    text-align: left;
+}
+
+.slider-title, .slider-value{
+    font-size: 15px;
+}
+
+.slider-value{
+    width: 60px;
 }
