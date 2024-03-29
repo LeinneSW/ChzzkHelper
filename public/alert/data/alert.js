@@ -22,15 +22,14 @@ const showAlert = (data) => {
     }catch(e){}
 
     profile.src = data.user?.profileImageUrl || './data/profile_default.png'
-    profile.onload = () => {
-        const element = document.getElementsByTagName('body')[0]
-        element.classList.add('fadeIn')
-        element.classList.remove('hidden')
+    profile.onload = () => setTimeout(() => {
+        document.body.classList.add('fadeIn')
+        document.body.classList.remove('hidden')
         setTimeout(() => {
             element.classList.add('fadeOut')
             setTimeout(async () => {
-                element.classList = []
-                element.classList.add('hidden')
+                document.body.classList = []
+                document.body.classList.add('hidden')
     
                 await new Promise(res => setTimeout(res, 500))
                 alertQueue.splice(alertQueue.indexOf(data), 1)
@@ -54,14 +53,13 @@ const addAlertData = (data) => {
 
 const checkError = () => {
     console.log('readyState', client?.readyState)
-    const body = document.getElementsByTagName('body')[0]
     if(client?.readyState === WebSocket.OPEN){
-        body.classList.add('hidden')
+        document.body.classList.add('hidden')
         document.getElementById('error').classList.add('hidden')
         document.getElementById('img').classList.remove('hidden')
         document.getElementById('text').classList.remove('hidden')
     }else{
-        body.classList.remove('hidden')
+        document.body.classList.remove('hidden')
         document.getElementById('img').classList.add('hidden')
         document.getElementById('text').classList.add('hidden')
         document.getElementById('error').classList.remove('hidden')
