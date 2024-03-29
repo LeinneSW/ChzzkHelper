@@ -38,7 +38,7 @@ const showAlert = (data) => {
                 }
             }, 995)
         }, 4000)
-    }
+    }, 0)
 }
 const addAlertData = (data) => {
     if(!data || typeof data !== 'object'){
