@@ -69,19 +69,9 @@ const connect = () => {
     client.onmessage = (e) => {
         try{
             const data = JSON.parse(e.data.toString())
-            const emojiReg = data.message.match(/{:[\w]*:}/g)
-            if(!emojiReg){
-                console.log('data.message', data.message)
-                console.log('data.emojiList', data.emojiList)
-                return
-            }
-            console.log('emojiText', emojiReg)
-
-            const rect = document.getElementsByTagName('body')[0].getBoundingClientRect()
-            for(let i = 0; i < emojiReg.length; ++i){
-                const emojiName = emojiReg[i].substring(2, emojiReg[i].length - 2)
-                const emojiUrl = data.emojiList[emojiName]
-                showEmoji(rect.width, rect.height, emojiUrl.split(`?`)[0])
+            const {width, height} = document.body.getBoundingClientRect()
+            for(const emojiName of data.emojiList){
+                showEmoji(width, height, data.emojiUrlList[emojiName].split('?')[0])
             }
         }catch{}
     }

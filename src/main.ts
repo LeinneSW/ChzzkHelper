@@ -62,8 +62,8 @@ const createEmojiTask = () => {
     Web.instance.app.post('/req/test_emoji', (req, res) => {
         res.sendStatus(200)
         const jsonData = JSON.stringify({
-            message: '{:d_47:}'.repeat(5),
-            emojiList: {'d_47': 'https://ssl.pstatic.net/static/nng/glive/icon/b_07.gif'},
+            emojiList: new Array(5).fill('d_47'),
+            emojiUrlList: {'d_47': 'https://ssl.pstatic.net/static/nng/glive/icon/b_07.gif'},
         })
         for(const client of emojiSocket){
             client.send(jsonData)
@@ -76,10 +76,19 @@ const createEmojiTask = () => {
         }
     }))
     Chzzk.instance.chat.on('chat', chat => {
-        const jsonData = JSON.stringify({
-            message: chat.message,
-            emojiList: chat.extras?.emojis || {},
-        })
+        const emojiUrlList = chat.extras?.emojis
+        if(!emojiUrlList || Object.keys(emojiUrlList).length < 1){
+            return
+        }
+
+        let match
+        const emojiList = []
+        const regex = /{:([\w]*):}/g
+        while((match = regex.exec(chat.message)) !== null){
+            emojiList.push(match[1])
+        }
+
+        const jsonData = JSON.stringify({emojiList, emojiUrlList})
         for(const client of emojiSocket){
             client.send(jsonData)
         }
