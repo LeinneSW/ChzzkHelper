@@ -10,12 +10,19 @@
     <span></span>
     <div class="settings" id="settings">
         <div class="settings-title left">이모티콘 오버레이 설정</div>
-        <div class="left slider-title">이모티콘 크기</div>
+        <div style="display: flex; margin-bottom: 6px;">
+            <div class="option-title" style="flex: 1">이모티콘 효과</div>
+            <select id="effectTypeBox">
+                <option value="fade">페이드</option>
+                <option value="zoom">줌</option>
+            </select>
+        </div>
+        <div class="option-title">이모티콘 크기</div>
         <div class="slider-container">
             <input class="slider" id="sizeSlider" type="range" min="1" max="300" value="150">
             <div class="slider-value" id="sizeSliderValue"></div>
         </div>
-        <div class="left slider-title">이모티콘 유지 시간</div>
+        <div class="option-title">이모티콘 유지 시간</div>
         <div class="slider-container">
             <input class="slider" id="timeSlider" type="range" min="1" max="30" value="3">
             <div class="slider-value" id="timeSliderValue">3초</div>
