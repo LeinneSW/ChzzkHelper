@@ -2,7 +2,7 @@ import {app, BrowserWindow, Tray, dialog, Menu} from "electron";
 import {WebSocket} from 'ws'
 import path from 'path'
 import {Chzzk} from "./chzzk/chzzk";
-import {readResource, saveResource} from "./utils/utils";
+import {getUserColor, readResource, saveResource} from "./utils/utils";
 import {Web} from "./web/web";
 
 const ttsSocket: WebSocket[] = []
@@ -16,12 +16,31 @@ const createTTSTask = () => {
         }
     }))
     Chzzk.instance.chat.on('chat', chat => {
-        const jsonData = JSON.stringify({
-            user: chat.profile,
+        const badgeList: string[] = []
+        if(chat.profile?.badge?.imageUrl){
+            badgeList.push(chat.profile.badge.imageUrl)
+        }
+        if(chat.profile.streamingProperty?.subscription?.badge?.imageUrl){
+            badgeList.push(chat.profile.streamingProperty.subscription.badge.imageUrl)
+        }
+        if(chat.profile.streamingProperty?.realTimeDonationRanking?.badge?.imageUrl){
+            badgeList.push(chat.profile.streamingProperty?.realTimeDonationRanking?.badge?.imageUrl)
+        }
+        for(const activityBadge of chat.profile.activityBadges){
+            if(activityBadge.activated){
+                badgeList.push(activityBadge.imageUrl)
+                break
+            }
+        }
+        const jsonStr = JSON.stringify({
+            nickname: chat.profile.nickname,
+            color: chat.profile.title?.color || getUserColor(chat.profile.userIdHash + Chzzk.instance.chat.chatChannelId),
             message: chat.message,
+            emojiList: chat.extras?.emojis || {},
+            badgeList
         })
         for(const client of ttsSocket){
-            client.send(jsonData)
+            client.send(jsonStr)
         }
     })
 }
