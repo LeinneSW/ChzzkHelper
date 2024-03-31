@@ -38,8 +38,17 @@ const connect = () => {
     client.onopen = () => client.send(`TTS`)
     client.onmessage = e => {
         try{
+            /*
+            interface ChatData{
+                nickname: string,
+                color: string,
+                message: string,
+                emojiList: {[name: string]: string},
+                badgeList: string[]
+            })
+            */
             const json = JSON.parse(e.data.toString())
-            if(json.user.nickname.endsWith('봇')){
+            if(json.nickname.endsWith('봇')){
                 return
             }
 
