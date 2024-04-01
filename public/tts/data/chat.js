@@ -30,6 +30,30 @@ const playTTS = (text) => {
     }
 }
 
+const escapeHTML = (text) => text.replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+const addChat = (nickname, text) => {
+    const messageBoxDiv = document.createElement('div')
+    messageBoxDiv.className = 'messageBox'
+    document.body.appendChild(messageBoxDiv)
+    setTimeout(() => messageBoxDiv.style.opacity = '1', 50)
+
+    const userSpan = document.createElement('span')
+    userSpan.className = 'nickname'
+    userSpan.innerText = nickname
+    userSpan.style.color = 'blue'
+    messageBoxDiv.appendChild(userSpan)
+
+    const messageSpan = document.createElement('span')
+    messageSpan.className = 'message'
+    messageSpan.innerHTML = ` : ${escapeHTML(text)}`
+    messageBoxDiv.appendChild(messageSpan)
+}
+
 const connect = () => {
     if(client?.readyState === WebSocket.OPEN){
         return;
@@ -45,9 +69,38 @@ const connect = () => {
                 message: string,
                 emojiList: {[name: string]: string},
                 badgeList: string[]
-            })
+            }
             */
             const json = JSON.parse(e.data.toString())
+
+            const messageBoxDiv = document.createElement('div')
+            messageBoxDiv.className = 'messageBox'
+            document.body.appendChild(messageBoxDiv)
+
+            setTimeout(() => messageBoxDiv.style.opacity = '1', 50)
+
+            for(const badgeUrl of json.badgeList){
+                const badgeImg = document.createElement('img')
+                badgeImg.src = badgeUrl
+                messageBoxDiv.appendChild(badgeImg)
+            }
+
+            const userSpan = document.createElement('span')
+            userSpan.className = 'nickname'
+            userSpan.innerText = json.nickname
+            userSpan.style.color = json.color
+            messageBoxDiv.appendChild(userSpan)
+
+            const messageSpan = document.createElement('span')
+            messageSpan.className = 'message'
+
+            let message = escapeHTML(json.message)
+            for(const emojiName in json.emojiList){
+                message = message.replaceAll(`{:${emojiName}:}`, `<img src='${json.emojiList[emojiName]}'>`)
+            }
+            messageSpan.innerHTML = ` : ${message}`
+            messageBoxDiv.appendChild(messageSpan)
+    
             if(json.nickname.endsWith('봇')){
                 return
             }

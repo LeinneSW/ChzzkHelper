@@ -1,0 +1,59 @@
+@font-face{
+    font-family: 'JalnanGothic';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_231029@1.1/JalnanGothic.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+*{
+    font-family: 'JalnanGothic';
+    font-size: 22px;
+}
+
+body, html{
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    margin: 0;
+    width: 100%;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+img{
+    width: 22px;
+    height: 22px;
+    margin-bottom: -2px; /** 텍스트와 이미지의 높이조절 */
+}
+
+.messageBox{
+    width: calc(100% - 16px);
+    margin: 8px;
+    padding: 8px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    background-color: rgba(0, 0, 0, 0.4);
+
+    opacity: 0;
+    transition: all .5s ease-in-out;
+}
+
+.nickname{
+    padding-left: 5px;
+}
+
+.nickname, .message{
+    text-shadow: 0 0 1px #000,
+                 0 0 2px #000, 
+                 0 0 3px rgba(0, 0, 0, 0.7),
+                 0 0 4px rgba(0, 0, 0, 0.7),
+                 0 0 5px rgba(0, 0, 0, 0.7),
+                -1px -1px 1px rgba(0, 0, 0, 0.7),  
+                 1px -1px 1px rgba(0, 0, 0, 0.7),
+                -1px  1px 1px rgba(0, 0, 0, 0.7),
+                 1px  1px 1px rgba(0, 0, 0, 0.7);
+}
+
+.message{
+    color: white;
+}
