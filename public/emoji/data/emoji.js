@@ -37,7 +37,7 @@ const showEmoji = (width, height, emojiUrl) => {
                     emoji.style.transform = 'scale(0)'
                     setTimeout(() => emoji.remove(), 600)
                 }, timeSlider.value * 1000);
-            }, 0)
+            }, 20)
             break;
         }
     }
