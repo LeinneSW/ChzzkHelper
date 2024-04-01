@@ -17,28 +17,29 @@ const showAlert = (data) => {
     const profile = document.getElementById('profile')
     document.getElementById('type').innerHTML = makeStrWithPulse(data.type || '팔로우')
     document.getElementById('nickname').innerHTML = makeStrWithPulse(data.user?.nickname)
-    try{
-        new Audio('./data/follow.mp3').play()
-    }catch(e){}
 
     profile.src = data.user?.profileImageUrl || './data/profile_default.png'
     profile.onload = () => setTimeout(() => {
-        document.body.classList.add('fadeIn')
-        document.body.classList.remove('hidden')
+        document.body.style.transition = 'opacity 1s ease'
+        document.body.style.opacity = '1'
+
         setTimeout(() => {
-            element.classList.add('fadeOut')
+            if(client?.readyState !== WebSocket.OPEN){
+                return
+            }
+
+            document.body.style.opacity = '0'
             setTimeout(async () => {
-                document.body.classList = []
-                document.body.classList.add('hidden')
-    
+                document.body.style.transition = ''
                 await new Promise(res => setTimeout(res, 500))
                 alertQueue.splice(alertQueue.indexOf(data), 1)
                 if(alertQueue.length > 0){
                     showAlert(alertQueue[0])
                 }
-            }, 995)
+            }, 1000)
         }, 4000)
     }, 0)
+    new Audio('./data/follow.mp3').play()
 }
 const addAlertData = (data) => {
     if(!data || typeof data !== 'object'){
@@ -52,14 +53,13 @@ const addAlertData = (data) => {
 }
 
 const checkError = () => {
-    console.log('readyState', client?.readyState)
     if(client?.readyState === WebSocket.OPEN){
-        document.body.classList.add('hidden')
+        document.body.style.opacity = '0'
         document.getElementById('error').classList.add('hidden')
         document.getElementById('img').classList.remove('hidden')
         document.getElementById('text').classList.remove('hidden')
     }else{
-        document.body.classList.remove('hidden')
+        document.body.style.opacity = '1'
         document.getElementById('img').classList.add('hidden')
         document.getElementById('text').classList.add('hidden')
         document.getElementById('error').classList.remove('hidden')
