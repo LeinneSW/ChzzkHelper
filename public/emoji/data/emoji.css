@@ -22,15 +22,8 @@ body{
 }
 
 /** Slider CSS */
-.settings-title{
-    font-size: 22px;
-    font-weight: bold;
-    padding-bottom: 20px;
-}
-
 .settings{
     z-index: 9999;
-    display: none;
     position: fixed;
     top: 10px;
     right: 10px;
@@ -39,10 +32,19 @@ body{
     border: 3px solid #beff80;
     border-radius: 9px;
     padding: 10px;
+
+    opacity: 0;
+    transition: opacity .5s ease-in-out;
+}
+
+.settings-title{
+    font-size: 22px;
+    font-weight: bold;
+    padding-bottom: 20px;
 }
 
 .settings.show{
-    display: block;
+    opacity: 1;
 }
 
 .slider-container{
