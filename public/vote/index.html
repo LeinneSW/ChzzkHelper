@@ -32,6 +32,10 @@
     <div style="display: flex; flex-direction: column; flex: 1; border-left: 2px solid black">
         <div class="title text-center" style="border-bottom: 2px solid #000; padding: 14px">실시간 채팅</div>
         <div id="chatBox"></div>
+        <div id="chatInputBox">
+            <input id="chatInput" type="text" placeholder="채팅을 입력해주세요" onkeypress="event.keyCode === 13 && sendChat(this)" style="flex: 1">
+            <button onclick="sendChat()">전송</button>
+        </div>
     </div>
 </body>
 </html>

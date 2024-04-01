@@ -82,6 +82,13 @@ const onVoteInputClick = (event) => {
     event.target.children[0]?.focus()
 }
 
+const sendChat = () => {
+    const input = document.getElementById(`chatInput`)
+    alert('아직 준비중인 기능입니다.')
+    input.value = ''
+    setTimeout(() => input.focus(), 150)
+}
+
 const connect = () => {
     if(client?.readyState === WebSocket.OPEN){
         return
@@ -96,8 +103,11 @@ const connect = () => {
 
             const chat = document.createElement('div')
             chat.style = 'margin: 0 20px'
-            chat.innerHTML = data.user.nickname + ': ' + data.message
-            document.getElementById('chatBox').appendChild(chat)
+            chat.innerText = data.user.nickname + ' : ' + data.message // TODO: show emoji
+
+            const chatBox = document.getElementById('chatBox')
+            chatBox.appendChild(chat)
+            chatBox.scrollTop = chatBox.scrollHeight
             
             if(!document.getElementById('startBtn').disabled || document.getElementById('endBtn').disabled){
                 return
