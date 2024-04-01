@@ -186,7 +186,6 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
             nodeIntegration: true,
             defaultEncoding: 'utf-8',
         },
-        minimizable: false,
     })
     window.setMenu(null)
 
@@ -205,6 +204,7 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
     ]);
     tray.setContextMenu(trayMenu)
 
+    window.on('minimize', () => window.hide())
     window.on('close', event => {
         const response = dialog.showMessageBoxSync(window, {
             type: 'question',
