@@ -14,22 +14,19 @@ const startVote = (event) => {
     }
     
     event.target.disabled = true
+    document.getElementById('endBtn').disabled = false
+    document.getElementById('hideBtn').disabled = false
+
     const last = elements[elements.length - 1]
     last.parentElement.remove()
 
-    document.getElementById
     delete elements[elements.length - 1]
-    for(const input of elements){
-        input.readOnly = true
-        const span = input.parentElement.children[1]
-        span.innerHTML = '0명'
-        span.style = ''
-        span.onclick = () => {}
-    }
+    updateCount()
 }
 
 const endVote = (event) => {
     event.target.disabled = true
+    document.getElementById(`hideBtn`).disabled = true
     if(!countVisible){
         countVisible = true
         updateCount()
@@ -37,15 +34,17 @@ const endVote = (event) => {
 }
 
 const updateCount = (elements) => {
-    if(!elements){
-        elements = document.querySelectorAll('ol > li > span')
+    if(!document.getElementById('startBtn').disabled){
+        return
     }
+
+    elements = elements || document.querySelectorAll('ol > li > span')
     const totalCount = new Array(elements.length).fill(0)
     for(const id in voteData){
         ++totalCount[voteData[id].index]
     }
     for(const index in elements){
-        elements[index].innerHTML = (countVisible ? totalCount[index] : '?')+ '명'
+        elements[index].innerHTML = (countVisible ? totalCount[index] : '?') + '명'
     }
     document.getElementById('voteCountTitle').innerHTML = `참여자 - ${totalCount.reduce((a, c) => a + c)}명`
 }
