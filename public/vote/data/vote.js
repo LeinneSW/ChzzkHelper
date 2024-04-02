@@ -35,11 +35,11 @@ const startVote = (event) => {
         li.style.cursor = 'pointer'
         li.onclick = () => {
             if(currentUserListIndex === i){
-                li.style.border = ''
+                li.style.outline = ''
                 changeUserListIndex(-1)
             }else{
-                li.style.border = '2px solid #000'
-                currentUserListIndex === -1 || (document.querySelectorAll(`ol > li`)[currentUserListIndex].style.border = '')
+                li.style.outline = '2px solid #000'
+                currentUserListIndex === -1 || (document.querySelectorAll(`ol > li`)[currentUserListIndex].style.outline = '')
                 changeUserListIndex(i)
             }
         }
