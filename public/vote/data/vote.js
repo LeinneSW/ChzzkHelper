@@ -2,6 +2,8 @@ let client
 let voteData = {}
 let countVisible = true
 
+const getRequestUrl = () => window.localStorage.getItem('wsURL') || location.host || `127.0.0.1:54321`
+
 const startVote = (event) => {
     if(event.target.disabled){
         return
@@ -88,7 +90,7 @@ const onVoteInputClick = (event) => {
 
 const sendChat = () => {
     const input = document.getElementById(`chatInput`)
-    fetch(`http://${location.host || `127.0.0.1:54321`}/req/send_chat`, {
+    fetch(`http://${getRequestUrl()}/req/send_chat`, {
         headers: {
             'Content-Type': 'application/json'
         },
@@ -112,7 +114,7 @@ const connect = () => {
     }
 
     client?.close()
-    client = new WebSocket(`ws://${window.localStorage.getItem('wsURL') || location.host || `127.0.0.1:54321`}/ws`)
+    client = new WebSocket(`ws://${getRequestUrl()}/ws`)
     client.onopen = () => client.send('VOTE')
     client.onmessage = (e) => {
         try{
