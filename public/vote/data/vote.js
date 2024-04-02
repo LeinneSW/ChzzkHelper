@@ -26,7 +26,7 @@ const startVote = (event) => {
         span.style.cursor = ''
         span.onclick = () => {}
     }
-    updateCount()
+    updateVoteCount()
 }
 
 const endVote = (event) => {
@@ -34,11 +34,11 @@ const endVote = (event) => {
     document.getElementById(`hideBtn`).disabled = true
     if(!countVisible){
         countVisible = true
-        updateCount()
+        updateVoteCount()
     }
 }
 
-const updateCount = (elements) => {
+const updateVoteCount = (elements) => {
     if(!document.getElementById('startBtn').disabled){
         return
     }
@@ -57,7 +57,7 @@ const updateCount = (elements) => {
 const changeCountVisibility = (event) => {
     countVisible = !countVisible
     event.target.innerHTML = countVisible ? '숨기기' : '보이기'
-    updateCount()
+    updateVoteCount()
 }
 
 const focusEvent = (event) => {
@@ -124,7 +124,7 @@ const connect = () => {
                     if(!voteData[data.user.userIdHash]){
                         const userDiv = document.createElement('div')
                         userDiv.innerHTML = data.user.nickname
-                        userDiv.classList.add('text-center', 'vote-participant')
+                        userDiv.classList.add('text-center', 'vote-user')
                         document.getElementById('userList').appendChild(userDiv)
                     }
                     voteData[data.user.userIdHash] = {
@@ -134,7 +134,7 @@ const connect = () => {
                 }else{
                     return
                 }
-                updateCount(elements)
+                updateVoteCount(elements)
             }
         }catch(e){
             console.log(e)
