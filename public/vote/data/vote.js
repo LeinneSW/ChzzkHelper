@@ -19,8 +19,9 @@ const startVote = (event) => {
 
     const last = elements[elements.length - 1]
     last.parentElement.remove()
-
-    delete elements[elements.length - 1]
+    for(let i = 0; i < elements.length - 1; ++i){
+        elements[i].readOnly = true
+    }
     updateCount()
 }
 
