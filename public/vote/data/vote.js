@@ -35,11 +35,17 @@ const startVote = (event) => {
         li.style.cursor = 'pointer'
         li.onclick = () => {
             if(currentUserListIndex === i){
-                li.style.outline = ''
+                li.style.boxShadow = ''
+                li.style.borderColor = '#0000'
                 changeUserListIndex(-1)
             }else{
-                li.style.outline = '2px solid #000'
-                currentUserListIndex === -1 || (document.querySelectorAll(`ol > li`)[currentUserListIndex].style.outline = '')
+                li.style.borderColor = '#24fd24'
+                li.style.boxShadow = '0px 1px 4px rgba(0, 0, 0, 0.6)'
+                if(currentUserListIndex !== -1){
+                    const beforeSelectedLi = document.querySelectorAll(`ol > li`)[currentUserListIndex]
+                    beforeSelectedLi.style.boxShadow = ''
+                    beforeSelectedLi.style.borderColor = '#0000'
+                }
                 changeUserListIndex(i)
             }
         }

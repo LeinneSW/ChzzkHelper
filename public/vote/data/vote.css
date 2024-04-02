@@ -62,7 +62,28 @@ body{
 
 ol{
     padding: 0;
-    list-style-position: inside;
+    list-style-type: none;
+}
+
+ol > li{
+    padding: 8px;
+    position: relative;
+    border-left: 8px solid #0000;
+    counter-increment: list-counter;
+}
+
+ol > li:hover{
+    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+ol > li:before{
+    color: green;
+    content: counter(list-counter);
+}
+
+ol > li > span{
+    position: absolute;
+    right: 16px;
 }
 
 .vote-user{
