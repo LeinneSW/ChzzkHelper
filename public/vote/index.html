@@ -3,12 +3,15 @@
 <head>
     <meta charset="utf-8">
     <title>채팅 투표/추첨기</title>
-    <link rel="stylesheet" href="./data/vote.css">
     <script src="./data/vote.js"></script>
+    <link rel="stylesheet" href="./data/vote.css">
 </head>
 <body onload="connect()">
     <div id="userList" style="border-right: 2px solid black; width: 240px">
-        <div id="voteCountTitle" class="text-center">참여자 - 0명</div>
+        <div id="voteUserListTitle" class="text-center">
+            <span id="voteUserCurrent">0명</span>
+            <span id="voteUserTotal">(총 0명)</span>
+        </div>
     </div>
     <div style="display: flex; flex-direction: column; flex: 1; margin: 0 20px;">
         <div class="title">숫자 투표</div>
@@ -23,7 +26,7 @@
         </div>
         <hr style="width: 99%; margin: 0 auto">
         <ol style="font-size: 30px; margin: 20px">
-            <li onclick="onVoteInputClick(event)">
+            <li onclick="this.children[0]?.focus()">
                 <input class="input" type="text" placeholder="새 항목 추가" onfocusout="focusEvent(event)" spellcheck="false">
                 <span></span>
             </li>

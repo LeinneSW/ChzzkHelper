@@ -53,7 +53,7 @@ body{
     display: flex;
 }
 
-#voteCountTitle{
+#voteUserListTitle{
     height: 60px;
     font-size: 28px;
     font-weight: bold;

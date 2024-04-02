@@ -1,6 +1,7 @@
 let client
-let voteData = {}
+let voteMap = {}
 let countVisible = true
+let currentUserListIndex = -1
 
 const getRequestUrl = () => window.localStorage.getItem('wsURL') || location.host || `127.0.0.1:54321`
 
@@ -22,11 +23,26 @@ const startVote = (event) => {
     const last = elements[elements.length - 1]
     last.parentElement.remove()
     for(let i = 0; i < elements.length - 1; ++i){
-        elements[i].readOnly = true
+        const input = elements[i]
+        input.readOnly = true
+        input.style.cursor = 'pointer'
 
-        const span = elements[i].parentElement.children[1]
+        const span = input.parentElement.children[1]
         span.style.cursor = ''
         span.onclick = () => {}
+
+        const li = input.parentElement
+        li.style.cursor = 'pointer'
+        li.onclick = () => {
+            if(currentUserListIndex === i){
+                li.style.border = ''
+                changeUserListIndex(-1)
+            }else{
+                li.style.border = '2px solid #000'
+                currentUserListIndex === -1 || (document.querySelectorAll(`ol > li`)[currentUserListIndex].style.border = '')
+                changeUserListIndex(i)
+            }
+        }
     }
     updateVoteCount()
 }
@@ -47,18 +63,77 @@ const updateVoteCount = (elements) => {
 
     elements = elements || document.querySelectorAll('ol > li > span')
     const totalCount = new Array(elements.length).fill(0)
-    for(const id in voteData){
-        ++totalCount[voteData[id].index]
+    for(const id in voteMap){
+        ++totalCount[voteMap[id].index]
     }
     for(const index in elements){
         elements[index].innerHTML = (countVisible ? totalCount[index] : '?') + '명'
     }
-    document.getElementById('voteCountTitle').innerHTML = `참여자 - ${totalCount.reduce((a, c) => a + c)}명`
+    document.getElementById('voteUserTotal').innerText = `(총 ${totalCount.reduce((a, c) => a + c)}명)`
+}
+
+const changeUserListIndex = (index) => {
+    if(currentUserListIndex === index){
+        return
+    }
+
+    currentUserListIndex = index
+    const userList = document.getElementById('userList')
+    while(userList.lastChild.id !== 'voteUserListTitle'){
+        userList.removeChild(userList.lastChild)
+    }
+
+    let current = 0
+    for(const userId in voteMap){
+        const voteData = voteMap[userId]
+        if(voteData.index !== index && index !== -1){
+            continue
+        }
+        ++current
+        const element = document.createElement('div')
+        element.id = voteData.user.userIdHash
+        element.innerText = voteData.user.nickname
+        element.classList.add('text-center', 'vote-user')
+        userList.appendChild(element)
+    }
+    document.getElementById('voteUserCurrent').innerText = current + '명'
+}
+
+const addVoteUser = (user, index) => {
+    if(typeof index !== 'number' || isNaN(index) || !isFinite(index)){
+        return
+    }
+
+    const elements = document.querySelectorAll('ol > li > span')
+    if(0 > index || index > elements.length){
+        return
+    }
+
+    const before = voteMap[user.userIdHash]
+    voteMap[user.userIdHash] = {user, index}
+    updateVoteCount(elements)
+
+    if(index !== currentUserListIndex && currentUserListIndex !== -1){
+        before && document.getElementById(user.userIdHash)?.remove()
+        return
+    }
+
+    if(document.getElementById(user.userIdHash)){
+        return
+    }
+    const userDiv = document.createElement('div')
+    userDiv.id = user.userIdHash
+    userDiv.innerText = user.nickname
+    userDiv.classList.add('text-center', 'vote-user')
+    document.getElementById('userList').appendChild(userDiv)
+    
+    const voteCurrent = document.getElementById('voteUserCurrent')
+    voteCurrent.innerText = (parseInt(voteCurrent.innerText) + 1) + '명'
 }
 
 const changeCountVisibility = (event) => {
     countVisible = !countVisible
-    event.target.innerHTML = countVisible ? '숨기기' : '보이기'
+    event.target.innerText = countVisible ? '숨기기' : '보이기'
     updateVoteCount()
 }
 
@@ -68,24 +143,22 @@ const focusEvent = (event) => {
     }
 
     const temp = event.target.value
-    if(temp){
-        const list = document.querySelectorAll('ol > li > input')
-        if(list[list.length - 1] === event.target){
-            event.target.value = ''
-            const element = event.target.parentElement.cloneNode(true)
-            event.target.parentElement.parentElement.appendChild(element)
-            event.target.value = temp
-
-            const span = event.target.parentElement.children[1]
-            span.innerHTML = 'X'
-            span.style.cursor = 'pointer'
-            span.onclick = (event) => {event.target.parentElement.remove()}
-        }
+    if(!temp){
+        return
     }
-}
 
-const onVoteInputClick = (event) => {
-    event.target.children[0]?.focus()
+    const list = document.querySelectorAll('ol > li > input')
+    if(list[list.length - 1] === event.target){
+        event.target.value = ''
+        const element = event.target.parentElement.cloneNode(true)
+        event.target.parentElement.parentElement.appendChild(element)
+        event.target.value = temp
+
+        const span = event.target.parentElement.children[1]
+        span.innerHTML = 'X'
+        span.style.cursor = 'pointer'
+        span.onclick = (event) => {event.target.parentElement.remove()}
+    }
 }
 
 const sendChat = () => {
@@ -126,30 +199,14 @@ const connect = () => {
 
             const chatBox = document.getElementById('chatBox')
             chatBox.appendChild(chat)
-            chatBox.scrollTop = chatBox.scrollHeight
-            
-            if(!document.getElementById('startBtn').disabled || document.getElementById('endBtn').disabled){
-                return
-            }
+            chatBox.scrollTop = chatBox.scrollHeight // chat auto scroll
 
-            if(data.message.startsWith('!투표')){
-                const index = parseInt(data.message.split(' ')[1] || '')
-                const elements = document.querySelectorAll('ol > li > span')
-                if(!isNaN(index) && 0 < index && index <= elements.length){
-                    if(!voteData[data.user.userIdHash]){
-                        const userDiv = document.createElement('div')
-                        userDiv.innerHTML = data.user.nickname
-                        userDiv.classList.add('text-center', 'vote-user')
-                        document.getElementById('userList').appendChild(userDiv)
-                    }
-                    voteData[data.user.userIdHash] = {
-                        user: data.user,
-                        index: index - 1
-                    };
-                }else{
-                    return
-                }
-                updateVoteCount(elements)
+            if(
+                document.getElementById('startBtn').disabled &&
+                !document.getElementById('endBtn').disabled &&
+                data.message.startsWith('!투표')
+            ){
+                addVoteUser(data.user, parseInt(data.message.split(' ')[1] || '') - 1)
             }
         }catch(e){
             console.log(e)
