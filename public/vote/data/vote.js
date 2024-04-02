@@ -88,9 +88,22 @@ const onVoteInputClick = (event) => {
 
 const sendChat = () => {
     const input = document.getElementById(`chatInput`)
-    alert('아직 준비중인 기능입니다.')
-    input.value = ''
-    setTimeout(() => input.focus(), 150)
+    fetch(`http://${location.host || `127.0.0.1:54321`}/req/send_chat`, {
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        method: 'post',
+        body: JSON.stringify({
+            message: input.value
+        })
+    }).then(res => {
+        if(res.status !== 200){
+            alert('ERROR!')
+            return
+        }
+        input.value = ''
+        input.focus()
+    })
 }
 
 const connect = () => {

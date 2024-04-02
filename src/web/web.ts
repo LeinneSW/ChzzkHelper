@@ -23,6 +23,7 @@ export class Web{
         }
 
         this.app = express()
+        this.app.use(express.json())
         this.app.use('/', express.static(path.join(__dirname , './../../public/')))
 
         this.server = this.app.listen(54321, () => {})
