@@ -21,6 +21,10 @@ const startVote = (event) => {
     last.parentElement.remove()
     for(let i = 0; i < elements.length - 1; ++i){
         elements[i].readOnly = true
+
+        const span = elements[i].parentElement.children[1]
+        span.style.cursor = ''
+        span.onclick = () => {}
     }
     updateCount()
 }
@@ -72,7 +76,7 @@ const focusEvent = (event) => {
 
             const span = event.target.parentElement.children[1]
             span.innerHTML = 'X'
-            span.style = 'cursor: pointer'
+            span.style.cursor = 'pointer'
             span.onclick = (event) => {event.target.parentElement.remove()}
         }
     }
