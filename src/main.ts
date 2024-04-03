@@ -4,6 +4,7 @@ import path from 'path'
 import {Chzzk} from "./chzzk/chzzk";
 import {getUserColor, readResource, saveResource} from "./utils/utils";
 import {Web} from "./web/web";
+import electronShortCut from 'electron-localshortcut';
 
 const ttsSocket: WebSocket[] = []
 const createTTSTask = () => {
@@ -196,6 +197,9 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
         },
     })
     window.setMenu(null)
+    electronShortCut.register(window, ['Ctrl+R', 'F5'], () => window.webContents.reload())
+    electronShortCut.register(window, 'Ctrl+Shift+I', () => window.webContents.toggleDevTools())
+    electronShortCut.register(window, 'Ctrl+Shift+R', () => window.webContents.reloadIgnoringCache())
 
     const tray = new Tray(icon)
     tray.setToolTip('치지직 도우미')
