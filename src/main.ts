@@ -1,4 +1,4 @@
-import {app, BrowserWindow, Tray, dialog, Menu} from "electron";
+import {app, BrowserWindow, Tray, dialog, Menu, ipcMain} from "electron";
 import {WebSocket} from 'ws'
 import path from 'path'
 import {Chzzk} from "./chzzk/chzzk";
@@ -192,6 +192,7 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
         webPreferences: {
             nodeIntegration: true,
             defaultEncoding: 'utf-8',
+            preload: path.join(__dirname, 'preload.js')
         },
     })
     window.setMenu(null)
@@ -273,5 +274,13 @@ app.whenReady().then(async () => {
         type: 'info',
         title: '네이버 로그인 필요',
         message: '로그인이 필요한 서비스입니다.\n로그인 후 진행해주세요.'
+    })
+})
+
+ipcMain.on('alert', (_, message, title) => {
+    dialog.showMessageBox({
+        type: 'info',
+        title,
+        message: message || ''
     })
 })

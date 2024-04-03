@@ -6,8 +6,8 @@
     <script>
         const copy = () => {
             navigator.clipboard.writeText(`http://127.0.0.1:54321/chatting/`)
-            .then(() => alert('복사 완료'))
-            .catch(() => alert('복사 실패'))
+            .then(() => window.api.alert('복사 완료'))
+            .catch(() => window.api.alert('복사 실패'))
         }
     </script>
 </head>

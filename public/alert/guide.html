@@ -6,8 +6,8 @@
     <script>
         const copy = () => {
             navigator.clipboard.writeText(`http://127.0.0.1:54321/alert/`)
-            .then(() => alert('복사 완료'))
-            .catch(() => alert('복사 실패'))
+            .then(() => window.api.alert('복사 완료'))
+            .catch(() => window.api.alert('복사 실패'))
         }
         const testFollow = () => {
             fetch(`http://127.0.0.1:54321/req/test_alert?type=follow`, {method: 'post'})

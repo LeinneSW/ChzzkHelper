@@ -12,7 +12,7 @@ const startVote = (event) => {
 
     const elements = document.querySelectorAll('ol > li > input')
     if(elements.length < 2){
-        alert('투표할 항목을 입력해주세요')
+        window.api.alert('투표할 항목을 입력해주세요')
         return
     }
     
@@ -179,7 +179,7 @@ const sendChat = () => {
         })
     }).then(res => {
         if(res.status !== 200){
-            alert('ERROR!')
+            window.api.alert('ERROR!')
             return
         }
         input.value = ''
