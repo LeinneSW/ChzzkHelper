@@ -230,7 +230,10 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
                 window.hide()
             case 0:
                 event.preventDefault()
-                break;
+                break
+            default:
+                window.destroy()
+                break
         }
     })
     await window.loadFile(path.join(__dirname, '../public/index.html'))
