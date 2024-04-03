@@ -6,10 +6,6 @@ html, body{
     height: 100%;
 }
 
-body{
-    display: flex;
-}
-
 .title{
     padding: 6px;
     font-size: 28px;
