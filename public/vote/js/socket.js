@@ -17,6 +17,11 @@ const startVote = (event) => {
         return
     }
 
+    window.onbeforeunload = event => {
+        window.api.alert('투표가 진행중입니다. 다른화면으로 이동하려면 투표를 마감해주세요.', '투표 진행중')
+        return ''
+    }
+
     const elements = document.querySelectorAll('ol > li > input')
     if(elements.length < 2){
         window.api.alert('투표할 항목을 입력해주세요')
@@ -62,6 +67,7 @@ const startVote = (event) => {
 
 const endVote = (event) => {
     event.target.disabled = true
+    window.onbeforeunload = null
     document.getElementById(`hideBtn`).disabled = true
     if(!countVisible){
         countVisible = true
