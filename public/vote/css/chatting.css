@@ -1,0 +1,12 @@
+#chatting-context-container{
+    flex: 1;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    overflow-y: auto;
+}
+
+#chatting-input-container{
+    width: 100%;
+    height: 36px;
+    display: flex;
+}

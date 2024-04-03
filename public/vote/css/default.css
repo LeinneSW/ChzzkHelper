@@ -1,0 +1,36 @@
+
+html, body{
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+body{
+    display: flex;
+}
+
+.title{
+    padding: 6px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.text-center{
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-1{
+    flex: 1;
+}
+
+.border-left{
+    border-left: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
+}
+
+.border-right{
+    border-right: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color) !important;
+}

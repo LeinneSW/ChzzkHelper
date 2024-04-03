@@ -5,6 +5,13 @@ let currentUserListIndex = -1
 
 const getRequestUrl = () => window.localStorage.getItem('wsURL') || location.host || `127.0.0.1:54321`
 
+const random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min
+
+const selectRandomUser = () => {
+    const users = document.getElementById('user-list').children
+    window.api.alert(`${users[random(0, users.length - 1)].innerText}님 축하드립니다. 당첨되었습니다!`, '추첨 결과')
+}
+
 const startVote = (event) => {
     if(event.target.disabled){
         return
@@ -75,7 +82,7 @@ const updateVoteCount = (elements) => {
     for(const index in elements){
         elements[index].innerHTML = (countVisible ? totalCount[index] : '?') + '명'
     }
-    document.getElementById('voteUserTotal').innerText = `(총 ${totalCount.reduce((a, c) => a + c)}명)`
+    document.getElementById('user-total-count').innerText = `(총 ${totalCount.reduce((a, c) => a + c)}명)`
 }
 
 const changeUserListIndex = (index) => {
@@ -84,8 +91,8 @@ const changeUserListIndex = (index) => {
     }
 
     currentUserListIndex = index
-    const userList = document.getElementById('userList')
-    while(userList.lastChild.id !== 'voteUserListTitle'){
+    const userList = document.getElementById('user-list')
+    while(userList.lastChild){
         userList.removeChild(userList.lastChild)
     }
 
@@ -99,13 +106,13 @@ const changeUserListIndex = (index) => {
         const element = document.createElement('div')
         element.id = voteData.user.userIdHash
         element.innerText = voteData.user.nickname
-        element.classList.add('text-center', 'vote-user')
+        element.classList.add('user')
         userList.appendChild(element)
     }
-    document.getElementById('voteUserCurrent').innerText = current + '명'
+    document.getElementById('user-current-count').innerText = current + '명'
 }
 
-const addVoteUser = (user, index) => {
+const addVoteData = (user, index) => {
     if(typeof index !== 'number' || isNaN(index) || !isFinite(index)){
         return
     }
@@ -130,10 +137,10 @@ const addVoteUser = (user, index) => {
     const userDiv = document.createElement('div')
     userDiv.id = user.userIdHash
     userDiv.innerText = user.nickname
-    userDiv.classList.add('text-center', 'vote-user')
-    document.getElementById('userList').appendChild(userDiv)
+    userDiv.classList.add('user')
+    document.getElementById('user-list').appendChild(userDiv)
     
-    const voteCurrent = document.getElementById('voteUserCurrent')
+    const voteCurrent = document.getElementById('user-current-count')
     voteCurrent.innerText = (parseInt(voteCurrent.innerText) + 1) + '명'
 }
 
@@ -141,50 +148,6 @@ const changeCountVisibility = (event) => {
     countVisible = !countVisible
     event.target.innerText = countVisible ? '숨기기' : '보이기'
     updateVoteCount()
-}
-
-const focusEvent = (event) => {
-    if(document.getElementById('startBtn').disabled){
-        return
-    }
-
-    const temp = event.target.value
-    if(!temp){
-        return
-    }
-
-    const list = document.querySelectorAll('ol > li > input')
-    if(list[list.length - 1] === event.target){
-        event.target.value = ''
-        const element = event.target.parentElement.cloneNode(true)
-        event.target.parentElement.parentElement.appendChild(element)
-        event.target.value = temp
-
-        const span = event.target.parentElement.children[1]
-        span.innerHTML = 'X'
-        span.style.cursor = 'pointer'
-        span.onclick = (event) => {event.target.parentElement.remove()}
-    }
-}
-
-const sendChat = () => {
-    const input = document.getElementById(`chatInput`)
-    fetch(`http://${getRequestUrl()}/req/send_chat`, {
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        method: 'post',
-        body: JSON.stringify({
-            message: input.value
-        })
-    }).then(res => {
-        if(res.status !== 200){
-            window.api.alert('ERROR!')
-            return
-        }
-        input.value = ''
-        input.focus()
-    })
 }
 
 const connect = () => {
@@ -203,7 +166,7 @@ const connect = () => {
             chat.style = 'margin: 0 20px'
             chat.innerText = data.user.nickname + ' : ' + data.message // TODO: show emoji
 
-            const chatBox = document.getElementById('chatBox')
+            const chatBox = document.getElementById('chatting-context-container')
             chatBox.appendChild(chat)
             chatBox.scrollTop = chatBox.scrollHeight // chat auto scroll
 
@@ -212,7 +175,7 @@ const connect = () => {
                 !document.getElementById('endBtn').disabled &&
                 data.message.startsWith('!투표')
             ){
-                addVoteUser(data.user, parseInt(data.message.split(' ')[1] || '') - 1)
+                addVoteData(data.user, parseInt(data.message.split(' ')[1] || '') - 1)
             }
         }catch(e){
             console.log(e)

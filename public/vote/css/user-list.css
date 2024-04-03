@@ -1,0 +1,17 @@
+#user-container{
+    width: 260px;
+}
+
+#user-current-count{
+    font-size: 28px;
+}
+
+#user-total-count{
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.user{
+    font-size: 22px;
+    text-align: center;
+}

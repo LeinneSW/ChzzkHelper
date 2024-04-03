@@ -1,0 +1,45 @@
+#vote-container{
+    overflow: hidden auto;
+}
+
+#vote-item-list{
+    margin: 10px;
+    font-size: 26px;
+    padding: 0 !important;
+    list-style-type: none;
+}
+
+#vote-item-list > li{
+    padding: 8px;
+    position: relative;
+    border-left: 8px solid #0000;
+    counter-increment: list-counter;
+}
+
+#vote-item-list > li:focus{
+    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+#vote-item-list > li:hover{
+    box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+#vote-item-list > li:before{
+    color: green;
+    content: counter(list-counter);
+}
+
+#vote-item-list > li > span{
+    position: absolute;
+    right: 16px;
+}
+
+#vote-item-list > li > input{
+    flex: 1;
+    border: 0;
+    font-size: 26px;
+}
+
+#vote-item-list > li > input:focus{
+    outline: none;
+}
