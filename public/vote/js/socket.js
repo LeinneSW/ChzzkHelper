@@ -3,7 +3,7 @@ let voteMap = {}
 let countVisible = true
 let currentUserListIndex = -1
 
-const getRequestUrl = () => window.localStorage.getItem('wsURL') || location.host || `127.0.0.1:54321`
+const getRequestUrl = () => window.localStorage.getItem('wsURL') || location.host
 
 const random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min
 

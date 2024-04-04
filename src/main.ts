@@ -224,7 +224,6 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
             title: `치지직 도우미 종료`,
             message: '치치직 도우미를 종료하시겠습니까?\n(OBS에 추가한 브라우저 위젯들은 도우미가 켜져있어야 동작합니다.)'
         })
-        
         switch(response){
             case 1:
                 window.hide()
@@ -236,7 +235,7 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
                 break
         }
     })
-    await window.loadFile(path.join(__dirname, '../public/index.html'))
+    await window.loadURL('http://127.0.0.1:54321/')
     window.show()
     return true
 }

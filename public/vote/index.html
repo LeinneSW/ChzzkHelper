@@ -5,6 +5,7 @@
     <title>채팅 투표/추첨기</title>
     <script src="./js/event.js"></script>
     <script src="./js/socket.js"></script>
+    <script src="/include/include.js"></script>
     <link rel="stylesheet" href="./css/default.css">
     <link rel="stylesheet" href="./css/chatting.css">
     <link rel="stylesheet" href="./css/user-list.css">
@@ -14,35 +15,7 @@
 </head>
 <body onload="connect()">
     <div class="d-flex flex-column h-100">
-        <header>
-            <div class="px-3 py-2 border-bottom">
-                <div class="container">
-                    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                        <a href="../index.html" class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
-                            <img width="60" height="60" src="../img/chzzk.png">
-                        </a>
-                        <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
-                            <li>
-                                <a href="/vote/" class="nav-link text-secondary disabled">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-heart-fill d-block mx-auto mb-1" viewBox="0 0 16 16">
-                                        <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-                                    </svg>
-                                    투표/추첨기
-                                </a>
-                            </li>
-                            <li>
-                                <a href="../alert/guide.html" class="nav-link text-black">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-bell d-block mx-auto mb-1" viewBox="0 0 16 16">
-                                        <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2M8 1.918l-.797.161A4 4 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4 4 0 0 0-3.203-3.92zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5 5 0 0 1 13 6c0 .88.32 4.2 1.22 6"/>
-                                    </svg>
-                                    알림이
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </header>
+        <div data-include-path="/include/header.html"></div>
         <div class="d-flex flex-1" style="overflow: hidden;">
             <div id="user-container" class="d-flex flex-column bg-body-tertiary border-right">
                 <div class="border-bottom text-center p-3">
