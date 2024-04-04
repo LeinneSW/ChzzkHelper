@@ -32,6 +32,7 @@ const startVote = (event) => {
     event.target.disabled = true
     document.getElementById('endBtn').disabled = false
     document.getElementById('hideBtn').disabled = false
+    document.getElementById('vote-title').innerText = '투표 - 진행중'
 
     const last = elements[elements.length - 1]
     last.parentElement.remove()
@@ -70,6 +71,7 @@ const endVote = (event) => {
     event.target.disabled = true
     window.onbeforeunload = null
     document.getElementById(`hideBtn`).disabled = true
+    document.getElementById('vote-title').innerText = '투표 - 마감'
     if(!countVisible){
         countVisible = true
         updateVoteCount()
