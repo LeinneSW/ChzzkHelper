@@ -1,3 +1,10 @@
+const random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min
+
+const selectRandomUser = () => {
+    const users = document.getElementById('user-list').children
+    window.api.alert(`축하드립니다 ${users[random(0, users.length - 1)].innerText}님. 당첨되었습니다!`, '추첨 결과')
+}
+
 const addVoteItem = (input) => {
     const voteContext = input.value
     if(!voteContext){

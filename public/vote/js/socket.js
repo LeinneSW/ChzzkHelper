@@ -5,13 +5,6 @@ let currentUserListIndex = -1
 
 const getRequestUrl = () => window.localStorage.getItem('wsURL') || location.host
 
-const random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min
-
-const selectRandomUser = () => {
-    const users = document.getElementById('user-list').children
-    window.api.alert(`${users[random(0, users.length - 1)].innerText}님 축하드립니다. 당첨되었습니다!`, '추첨 결과')
-}
-
 const startVote = (event) => {
     if(event.target.disabled){
         return
