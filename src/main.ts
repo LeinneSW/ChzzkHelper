@@ -190,7 +190,6 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
         defaultWidth: 1600,
         defaultHeight: 900,
     })
-    console.log(`heigth:`, windowState.height)
     const window = new BrowserWindow({
         x: windowState.x,
         y: windowState.y,
