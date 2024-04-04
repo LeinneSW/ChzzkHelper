@@ -5,6 +5,7 @@ import {Chzzk} from "./chzzk/chzzk";
 import {getUserColor, readResource, saveResource} from "./utils/utils";
 import {Web} from "./web/web";
 import electronShortCut from 'electron-localshortcut';
+import windowStateKeeper from "electron-window-state";
 
 const ttsSocket: WebSocket[] = []
 const createTTSTask = () => {
@@ -185,9 +186,16 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
     createCheckFollowTask()
     
     const icon = path.join(__dirname, '../resources/icon.png')
+    const windowState = windowStateKeeper({
+        defaultWidth: 1600,
+        defaultHeight: 900,
+    })
+    console.log(`heigth:`, windowState.height)
     const window = new BrowserWindow({
-        width: 1366,
-        height: 768,
+        x: windowState.x,
+        y: windowState.y,
+        width: windowState.width,
+        height: windowState.height,
         icon,
         show: false,
         webPreferences: {
@@ -197,6 +205,7 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
         },
     })
     window.setMenu(null)
+    windowState.manage(window)
     electronShortCut.register(window, ['Ctrl+R', 'F5'], () => window.webContents.reload())
     electronShortCut.register(window, 'Ctrl+Shift+I', () => window.webContents.toggleDevTools())
     electronShortCut.register(window, 'Ctrl+Shift+R', () => window.webContents.reloadIgnoringCache())
