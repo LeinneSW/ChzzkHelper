@@ -2,6 +2,10 @@ const random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min
 
 const selectRandomUser = () => {
     const users = document.getElementById('user-list').children
+    if(!users || users.length < 1){
+        window.api.alert('뽑을 인원이 없습니다.')
+        return
+    }
     window.api.alert(`축하드립니다 ${users[random(0, users.length - 1)].innerText}님. 당첨되었습니다!`, '추첨 결과')
 }
 
