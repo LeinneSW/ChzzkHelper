@@ -117,7 +117,7 @@ const connect = () => {
     client.onclose = () => setTimeout(() => connect(), 1000)
 }
 
-function init(){
+window.addEventListener('load', () => {
     const storage = window.localStorage
     ttsURL = storage.getItem('ttsURL')
     while(!ttsURL){
@@ -125,4 +125,4 @@ function init(){
         !ttsURL || storage.setItem('ttsURL', ttsURL)
     }
     connect()
-}
+})

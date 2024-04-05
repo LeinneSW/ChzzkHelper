@@ -1,3 +1,7 @@
+:root{
+    --font-size: 30px;
+}
+
 @font-face{
     font-family: 'JalnanGothic';
     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_231029@1.1/JalnanGothic.woff') format('woff');
@@ -7,7 +11,7 @@
 
 *{
     font-family: 'JalnanGothic';
-    font-size: 20px;
+    font-size: var(--font-size);
 }
 
 body, html{
@@ -21,9 +25,9 @@ body, html{
 }
 
 img{
-    width: 20px;
-    height: 20px;
-    margin-bottom: -2px; /** 텍스트와 이미지의 높이조절 */
+    width: var(--font-size);
+    height: var(--font-size);
+    margin-bottom: -.11em;
 }
 
 .messageBox{
