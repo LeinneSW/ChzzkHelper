@@ -7,7 +7,7 @@
 
 *{
     font-family: 'JalnanGothic';
-    font-size: 22px;
+    font-size: 20px;
 }
 
 body, html{
@@ -21,8 +21,8 @@ body, html{
 }
 
 img{
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     margin-bottom: -2px; /** 텍스트와 이미지의 높이조절 */
 }
 
