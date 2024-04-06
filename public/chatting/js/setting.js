@@ -1,14 +1,23 @@
+const setInputValue = (input, suffix) => {
+    input.nextElementSibling.innerText = input.value + suffix
+    const customCss = input.dataset.customCss
+    customCss && document.documentElement.style.setProperty(customCss, input.value + 'px')
+}
+
 window.addEventListener('load', () => {
     const settings = document.getElementById('settings')
-    console.log(settings)
     document.documentElement.addEventListener('mouseenter', () => settings.classList.add('show'))
     document.documentElement.addEventListener('mouseleave', () => settings.classList.remove('show'))
 
-    const sizeSliderValue = document.getElementById('sizeSliderValue')
-    sizeSlider.value = localStorage.getItem('chatFontSize') || 20
-    document.documentElement.style.setProperty('--font-size', sizeSliderValue.textContent = sizeSlider.value + 'px')
-    sizeSlider.addEventListener('input', () => {
-        localStorage.setItem('chatFontSize', sizeSlider.value)
-        document.documentElement.style.setProperty('--font-size', sizeSliderValue.textContent = sizeSlider.value + 'px')
-    })
+    const sliders = document.querySelectorAll('.slider-container > .slider')
+    for(const slider of sliders){
+        const saveName = slider.dataset.saveName
+        slider.value = (saveName && localStorage.getItem(saveName)) || slider.value
+        setInputValue(slider, 'px')
+        slider.addEventListener('input', () => {
+            setInputValue(slider, 'px')
+            const saveName = slider.dataset.saveName
+            saveName && localStorage.setItem(saveName, slider.value + '')
+        })
+    }
 })
