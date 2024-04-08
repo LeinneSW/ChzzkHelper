@@ -1,4 +1,4 @@
-let ttsURL, client, isProcessing = false, messageQueue = []
+let ttsURL, client, messageQueue = []
 const playList = [] // Audio[]
 
 const findRepeatedText = (str) => {
@@ -63,25 +63,21 @@ const connect = () => {
     client.onmessage = e => {
         try{
             messageQueue.push(e.data)
-            if(isProcessing){
+            if(messageQueue.length > 1){
                 return
             }
-
-            isProcessing = true
             const processMessage = () => {
-                let delay = 75 // 기본 딜레이 75ms
+                let delay = 70
                 if(messageQueue.length >= 50){
-                    delay = 0 // 대기 메시지 50개 이상 -> 0ms
-                }else if(messageQueue.length >= 10){
-                    delay = 10 // 대기 메시지 10개 이상 -> 10ms
+                    delay = 0
+                }else if(messageQueue.length >= 30){
+                    delay = 10
+                }else if(messageQueue.length >= 15){
+                    delay = 20
+                }else if(messageQueue.length > 5){
+                    delay = 45
                 }
-                
                 setTimeout(() => {
-                    if(messageQueue.length === 0){
-                        isProcessing = false
-                        return
-                    }
-
                     /*
                     interface ChatData{
                         nickname: string,
@@ -132,7 +128,10 @@ const connect = () => {
                     }else{
                         playTTS(json.message)
                     }
-                    processMessage()
+                    
+                    if(messageQueue.length > 0){
+                        processMessage()
+                    }
                 }, delay)
             }
             processMessage()
