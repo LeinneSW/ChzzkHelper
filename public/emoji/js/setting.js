@@ -6,8 +6,8 @@ const setInputValue = (input, suffix = '') => {
 
 window.addEventListener('load', () => {
     const settings = document.getElementById('settings')
-    document.body.addEventListener('mouseenter', () => settings.classList.add('show'))
-    document.body.addEventListener('mouseleave', () => settings.classList.remove('show'))
+    document.documentElement.addEventListener('mouseenter', () => settings.classList.add('show'))
+    document.documentElement.addEventListener('mouseleave', () => settings.classList.remove('show'))
 
     const sliders = document.querySelectorAll('.slider-container > .slider')
     for(const slider of sliders){
