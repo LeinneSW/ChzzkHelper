@@ -1,43 +1,39 @@
 let client
 let sizeSlider, timeSlider, effectTypeBox
 
-const random = (value) => Math.random() * (value - sizeSlider.value)
+const random = (value) => Math.random() * (value - parseInt(document.documentElement.style.getPropertyValue('--emoji-size')))
 
 const showEmoji = (width, height, emojiUrl) => {
     const emoji = document.createElement('img')
     emoji.src = emojiUrl
-    emoji.style.width = sizeSlider.value + 'px'
-    emoji.style.height = sizeSlider.value + 'px'
-            
+
     emoji.style.position = 'absolute'
     emoji.style.left = random(width) + 'px'
     emoji.style.top = random(height) + 'px'
 
-    switch(effectTypeBox.value){
+    switch(localStorage.getItem('effectType')){
         case 'fade':{
             emoji.style.opacity = '0';
             emoji.style.transition = 'opacity 1s ease'
-
             emoji.onload = () => setTimeout(() => {
                 emoji.style.opacity = '1';
                 setTimeout(() => {
                     emoji.style.opacity = '0';
                     setTimeout(() => emoji.remove(), 1000)
-                }, timeSlider.value * 1000)
-            }, 0)
+                }, localStorage.getItem('remainTime') * 1000)
+            }, 30)
             break;
         }
         case 'zoom':{
             emoji.style.transform = 'scale(0)'
             emoji.style.transition = 'transform .6s ease'
-
             emoji.onload = () => setTimeout(() => {
                 emoji.style.transform = 'scale(1)'
                 setTimeout(() => {
                     emoji.style.transform = 'scale(0)'
                     setTimeout(() => emoji.remove(), 600)
-                }, timeSlider.value * 1000);
-            }, 20)
+                }, localStorage.getItem('remainTime') * 1000);
+            }, 30)
             break;
         }
     }
@@ -80,35 +76,10 @@ const connect = () => {
         setTimeout(() => connect(), 1000)
     }
 }
-
-const init = () => {
-    sizeSlider = document.getElementById('sizeSlider')
-    timeSlider = document.getElementById('timeSlider')
+window.addEventListener('load', () => {
+    // TODO: 모든 세팅기능은 setting.js 로 이관되어야함
     effectTypeBox = document.getElementById('effectTypeBox')
-
-    const settings = document.getElementById('settings')
-    document.body.addEventListener('mouseenter', () => settings.classList.add('show'))
-    document.body.addEventListener('mouseleave', () => settings.classList.remove('show'))
-
-    const sizeSliderValue = document.getElementById('sizeSliderValue')
-    sizeSlider.value = localStorage.getItem('imgSize') || 150
-    sizeSliderValue.textContent = sizeSlider.value + 'px'
-    sizeSlider.addEventListener('input', () => {
-        sizeSliderValue.textContent = sizeSlider.value + 'px';
-        localStorage.setItem('imgSize', sizeSlider.value);
-    })
-
-    const timeSliderValue = document.getElementById('timeSliderValue')
-    timeSlider.value = localStorage.getItem('remainTime') || 3
-    timeSliderValue.textContent = timeSlider.value + '초'
-    timeSlider.addEventListener('input', () => {
-        timeSliderValue.textContent = timeSlider.value + '초';
-        localStorage.setItem('remainTime', timeSlider.value);
-    })
-
     effectTypeBox.value = localStorage.getItem('effectType') || 'fade'
-    effectTypeBox.addEventListener('input', () => {
-        localStorage.setItem('effectType', effectTypeBox.value)
-    })
+    effectTypeBox.addEventListener('input', () => localStorage.setItem('effectType', effectTypeBox.value))
     connect()
-}
+})

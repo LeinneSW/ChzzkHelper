@@ -3,10 +3,12 @@
 <head>
     <meta charset="utf-8">
     <title>치지직 이모티콘</title>
-    <link rel="stylesheet" href="./data/emoji.css">
-    <script src="./data/emoji.js"></script>
+    <script src="./js/emoji.js"></script>
+    <script src = './js/setting.js'></script>
+    <link rel="stylesheet" href="./css/emoji.css">
+    <link rel="stylesheet" href="./css/setting.css">
 </head>
-<body onload="init()">
+<body>
     <span></span>
     <div class="settings" id="settings">
         <div class="settings-title left">이모티콘 오버레이 설정</div>
@@ -19,13 +21,13 @@
         </div>
         <div class="option-title">이모티콘 크기</div>
         <div class="slider-container">
-            <input class="slider" id="sizeSlider" type="range" min="1" max="300" value="150">
+            <input class="slider" id="sizeSlider" type="range" min="1" max="300" value="150" data-save-name="imgSize" data-custom-css="--emoji-size" data-suffix="px">
             <div class="slider-value" id="sizeSliderValue"></div>
         </div>
         <div class="option-title">이모티콘 유지 시간</div>
         <div class="slider-container">
-            <input class="slider" id="timeSlider" type="range" min="1" max="30" value="3">
-            <div class="slider-value" id="timeSliderValue">3초</div>
+            <input class="slider" id="timeSlider" type="range" min="1" max="30" value="3" data-save-name="remainTime" data-suffix="초">
+            <div class="slider-value" id="timeSliderValue"></div>
         </div>
     </div>
 </body>
