@@ -1,4 +1,5 @@
 const random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min
+const easeOutExpo = (x) => 1 - Math.pow(2, -10 * x)
 
 const showAlertModal = (title, message) => {
     document.getElementById('alertTitle').innerText = title
@@ -6,14 +7,87 @@ const showAlertModal = (title, message) => {
     new bootstrap.Modal(document.getElementById('alertModal')).show()
 }
 
-const selectRandomUser = () => {
+const testAdd = () => {
+    const list = document.getElementById('user-list')
+    const data = [
+        "레이누",
+        "라링",
+        "BBQ1호점",
+        "삥삥이지유",
+        "점프마스터흥이",
+        "쓰리스트",
+        "에피메라",
+        "버섯인데요",
+        "최종병기드라군",
+        "시티",
+    ]
+    for(const name of data){
+        const div = document.createElement('div')
+        div.className = 'user'
+        div.innerHTML = name
+        list.appendChild(div)
+    }
+}
+
+const createRouletteData = (data) => {
+    let field = document.getElementById('roll-field')
+    if(!field){
+        field = document.createElement('div')
+        field.id = `roll-field`
+        document.getElementById('modalContext').appendChild(field)
+    }
+
+    while(field.firstChild){
+        field.removeChild(field.firstChild)
+    }
+    let currentIndex = Math.floor(Math.random() * data.length)
+    for(let i = 0; i < data.length; ++i){
+        const div = document.createElement('div')
+        div.classList.add('roll-item', 'p-2')
+        div.innerText = data[currentIndex++]
+        if(data.length <= currentIndex){
+            currentIndex = 0
+        }
+        field.appendChild(div)
+    }
+    field.appendChild(field.children[0].cloneNode(true))
+}
+
+const startRoulette = (users) => {
+    const data = []
+    for(const element of users){
+        data.push(element.innerText)
+    }
+    createRouletteData(data)
+
+    let time = 0;
+    const field = document.getElementById('roll-field')
+    field.classList.add('roll');
+    const interval = setInterval(() => {
+        const y = ((easeOutExpo(time += 0.001) * 1000) % 100) * data.length * -1;
+        field.style.setProperty('--y', `${y}%`);
+        if(time > 0.999){
+            field.scrollTop = field.scrollHeight * y / (Math.round(y / 100) * 100)
+            clearInterval(interval)
+            field.scrollTo({
+                top: field.scrollHeight,
+                behavior: 'smooth'
+            })
+            field.children[data.length].style.transition = `all .5s ease`
+            setTimeout(() => field.children[data.length].style.transform = 'scale(1.4)', 40)
+        }
+    }, 1);
+}
+
+const selectRandomUser = async () => {
     const users = document.getElementById('user-list').children
     if(!users || users.length < 2){
         showAlertModal('인원 부족', '추첨은 최소 2명 이상부터 가능합니다.')
         return
     }
-    // TODO: 추첨 룰렛 효과
-    showAlertModal('추첨 결과', `축하드립니다 ${users[random(0, users.length - 1)].innerText}님. 당첨되었습니다!`)
+    showAlertModal('추첨', ``)
+    await new Promise((res, _) => setTimeout(res, 250))
+    startRoulette(users)
 }
 
 const addVoteItem = (input) => {
