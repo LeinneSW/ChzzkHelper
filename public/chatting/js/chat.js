@@ -62,32 +62,17 @@ const connect = () => {
     client.onopen = () => client.send(`TTS`)
     client.onmessage = e => {
         try{
-            /*
-            interface ChatData{
-                nickname: string,
-                color: string,
-                message: string,
-                emojiList: {[name: string]: string},
-                badgeList: string[]
-            }
-            */
-
             messageQueue.push(e.data)
-
             if(isProcessing){
                 return
             }
 
             isProcessing = true
-
             const processMessage = () => {
                 let delay = 75 // 기본 딜레이 75ms
-
                 if(messageQueue.length >= 50){
-                    isProcessingMessage = false // 대기 메시지 50개 이상 -> 0ms
-                }
-
-                else if(messageQueue.length >= 10){
+                    delay = 0 // 대기 메시지 50개 이상 -> 0ms
+                }else if(messageQueue.length >= 10){
                     delay = 10 // 대기 메시지 10개 이상 -> 10ms
                 }
                 
@@ -97,6 +82,15 @@ const connect = () => {
                         return
                     }
 
+                    /*
+                    interface ChatData{
+                        nickname: string,
+                        color: string,
+                        message: string,
+                        emojiList: {[name: string]: string},
+                        badgeList: string[]
+                    }
+                    */
                     const json = JSON.parse(messageQueue.shift())
 
                     const messageBoxDiv = document.createElement('div')
@@ -138,18 +132,16 @@ const connect = () => {
                     }else{
                         playTTS(json.message)
                     }
-                    
                     processMessage()
                 }, delay)
             }
-
             processMessage()
         }catch{}
     }
     client.onclose = () => setTimeout(() => connect(), 1000)
 }
 
-function init(){
+window.addEventListener('load', () => {
     const storage = window.localStorage
     ttsURL = storage.getItem('ttsURL')
     while(!ttsURL){
@@ -157,4 +149,4 @@ function init(){
         !ttsURL || storage.setItem('ttsURL', ttsURL)
     }
     connect()
-}
+})
