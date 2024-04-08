@@ -1,4 +1,4 @@
-let ttsURL, client
+let ttsURL, client, isProcessing = false, messageQueue = []
 const playList = [] // Audio[]
 
 const findRepeatedText = (str) => {
@@ -71,53 +71,85 @@ const connect = () => {
                 badgeList: string[]
             }
             */
-            const json = JSON.parse(e.data.toString())
 
-            const messageBoxDiv = document.createElement('div')
-            messageBoxDiv.className = 'messageBox'
-            document.body.appendChild(messageBoxDiv)
+            messageQueue.push(e.data)
 
-            setTimeout(() => messageBoxDiv.style.opacity = '1', 50)
-
-            for(const badgeUrl of json.badgeList){
-                const badgeImg = document.createElement('img')
-                badgeImg.src = badgeUrl
-                messageBoxDiv.appendChild(badgeImg)
-            }
-
-            const userSpan = document.createElement('span')
-            userSpan.className = 'nickname'
-            userSpan.innerText = json.nickname
-            userSpan.style.color = json.color
-            messageBoxDiv.appendChild(userSpan)
-
-            const messageSpan = document.createElement('span')
-            messageSpan.className = 'message'
-
-            let message = escapeHTML(json.message)
-            for(const emojiName in json.emojiList){
-                message = message.replaceAll(`{:${emojiName}:}`, `<img src='${json.emojiList[emojiName]}'>`)
-            }
-            messageSpan.innerHTML = ` : ${message}`
-            messageBoxDiv.appendChild(messageSpan)
-    
-            if(json.nickname.endsWith('봇')){
+            if(isProcessing){
                 return
             }
 
-            const repeatData = findRepeatedText(json.message)
-            if(repeatData){
-                const {substring, count} = repeatData
-                playTTS(substring.repeat(substring.length < 3 ? Math.min(count, 8) : 3))
-            }else{
-                playTTS(json.message)
+            isProcessing = true
+
+            const processMessage = () => {
+                let delay = 75 // 기본 딜레이 75ms
+
+                if(messageQueue.length >= 50){
+                    isProcessingMessage = false // 대기 메시지 50개 이상 -> 0ms
+                }
+
+                else if(messageQueue.length >= 10){
+                    delay = 10 // 대기 메시지 10개 이상 -> 10ms
+                }
+                
+                setTimeout(() => {
+                    if(messageQueue.length === 0){
+                        isProcessing = false
+                        return
+                    }
+
+                    const json = JSON.parse(messageQueue.shift())
+
+                    const messageBoxDiv = document.createElement('div')
+                    messageBoxDiv.className = 'messageBox'
+                    document.body.appendChild(messageBoxDiv)
+
+                    setTimeout(() => messageBoxDiv.style.opacity = '1', 50)
+
+                    for(const badgeUrl of json.badgeList){
+                        const badgeImg = document.createElement('img')
+                        badgeImg.src = badgeUrl
+                        messageBoxDiv.appendChild(badgeImg)
+                    }
+
+                    const userSpan = document.createElement('span')
+                    userSpan.className = 'nickname'
+                    userSpan.innerText = json.nickname
+                    userSpan.style.color = json.color
+                    messageBoxDiv.appendChild(userSpan)
+
+                    const messageSpan = document.createElement('span')
+                    messageSpan.className = 'message'
+
+                    let message = escapeHTML(json.message)
+                    for(const emojiName in json.emojiList){
+                        message = message.replaceAll(`{:${emojiName}:}`, `<img src='${json.emojiList[emojiName]}'>`)
+                    }
+                    messageSpan.innerHTML = ` : ${message}`
+                    messageBoxDiv.appendChild(messageSpan)
+            
+                    if(json.nickname.endsWith('봇')){
+                        return
+                    }
+
+                    const repeatData = findRepeatedText(json.message)
+                    if(repeatData){
+                        const {substring, count} = repeatData
+                        playTTS(substring.repeat(substring.length < 3 ? Math.min(count, 8) : 3))
+                    }else{
+                        playTTS(json.message)
+                    }
+                    
+                    processMessage()
+                }, delay)
             }
+
+            processMessage()
         }catch{}
     }
     client.onclose = () => setTimeout(() => connect(), 1000)
 }
 
-window.addEventListener('load', () => {
+function init(){
     const storage = window.localStorage
     ttsURL = storage.getItem('ttsURL')
     while(!ttsURL){
@@ -125,4 +157,4 @@ window.addEventListener('load', () => {
         !ttsURL || storage.setItem('ttsURL', ttsURL)
     }
     connect()
-})
+}
