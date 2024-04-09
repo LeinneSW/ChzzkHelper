@@ -64,7 +64,7 @@ const selectRandomUser = async () => {
 
     const data = []
     for(const element of users){
-        data.push(element.innerText)
+        Math.random() > 0.5 ? data.push(element.innerText) : data.unshift(element.innerText)
     }
     createRouletteData(data)
 
