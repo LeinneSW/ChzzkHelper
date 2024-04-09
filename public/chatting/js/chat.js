@@ -87,7 +87,7 @@ const connect = () => {
                         badgeList: string[]
                     }
                     */
-                    const json = JSON.parse(messageQueue.shift())
+                    const json = JSON.parse(messageQueue[0])
 
                     const messageBoxDiv = document.createElement('div')
                     messageBoxDiv.className = 'messageBox'
@@ -129,6 +129,7 @@ const connect = () => {
                         playTTS(json.message)
                     }
                     
+                    messageQueue.shift()
                     if(messageQueue.length > 0){
                         processMessage()
                     }
