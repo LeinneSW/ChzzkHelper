@@ -7,28 +7,6 @@ const showAlertModal = (title, message) => {
     new bootstrap.Modal(document.getElementById('alertModal')).show()
 }
 
-const testAdd = () => {
-    const list = document.getElementById('user-list')
-    const data = [
-        "레이누",
-        "라링",
-        "BBQ1호점",
-        "삥삥이지유",
-        "점프마스터흥이",
-        "쓰리스트",
-        "에피메라",
-        "버섯인데요",
-        "최종병기드라군",
-        "시티",
-    ]
-    for(const name of data){
-        const div = document.createElement('div')
-        div.className = 'user'
-        div.innerHTML = name
-        list.appendChild(div)
-    }
-}
-
 const createRouletteData = (data) => {
     let field = document.getElementById('roll-field')
     if(!field){
