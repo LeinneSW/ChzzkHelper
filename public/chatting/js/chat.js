@@ -67,7 +67,7 @@ const connect = () => {
             }catch{}
         })()
 
-        if(typeof jsonData !== 'object'){
+        if(typeof json !== 'object'){
             return
         }
 
