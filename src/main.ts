@@ -7,46 +7,6 @@ import {Web} from "./web/web";
 import electronShortCut from 'electron-localshortcut';
 import windowStateKeeper from "electron-window-state";
 
-const chattingSocket: WebSocket[] = []
-const createChattingTask = () => {
-    Web.instance.socket.on('connection', client => client.on('message', data => {
-        const message = data.toString('utf-8')
-        if(message === 'CHATTING' && !chattingSocket.includes(client)){
-            chattingSocket.push(client)
-            client.onclose = () => chattingSocket.splice(chattingSocket.indexOf(client), 1)
-            return
-        }
-    }))
-    Chzzk.instance.chat.on('chat', chat => {
-        const badgeList: string[] = []
-        if(chat.profile?.badge?.imageUrl){
-            badgeList.push(chat.profile.badge.imageUrl)
-        }
-        if(chat.profile.streamingProperty?.subscription?.badge?.imageUrl){
-            badgeList.push(chat.profile.streamingProperty.subscription.badge.imageUrl)
-        }
-        if(chat.profile.streamingProperty?.realTimeDonationRanking?.badge?.imageUrl){
-            badgeList.push(chat.profile.streamingProperty?.realTimeDonationRanking?.badge?.imageUrl)
-        }
-        for(const activityBadge of chat.profile.activityBadges){
-            if(activityBadge.activated){
-                badgeList.push(activityBadge.imageUrl)
-                break
-            }
-        }
-        const jsonStr = JSON.stringify({
-            nickname: chat.profile.nickname,
-            color: chat.profile.title?.color || getUserColor(chat.profile.userIdHash + Chzzk.instance.chat.chatChannelId),
-            message: chat.message,
-            emojiList: chat.extras?.emojis || {},
-            badgeList
-        })
-        for(const client of chattingSocket){
-            client.send(jsonStr)
-        }
-    })
-}
-
 const voteSocket: WebSocket[] = []
 const createVoteTask = () => {
     Web.instance.socket.on('connection', client => client.on('message', data => {
@@ -56,16 +16,6 @@ const createVoteTask = () => {
             client.onclose = () => voteSocket.splice(voteSocket.indexOf(client), 1)
             return
         }
-
-        try{
-            const json = JSON.parse(message)
-            switch(json.type){
-                case 'SEND_MESSAGE':
-                    json.message && Chzzk.instance.chat.sendChat(json.message)
-                    break;
-            }
-            return
-        }catch{}
     }))
     Chzzk.instance.chat.on('chat', chat => {
         const jsonData = JSON.stringify({
@@ -112,6 +62,46 @@ const createEmojiTask = () => {
         const jsonData = JSON.stringify({emojiList, emojiUrlList})
         for(const client of emojiSocket){
             client.send(jsonData)
+        }
+    })
+}
+
+const chattingSocket: WebSocket[] = []
+const createChattingTask = () => {
+    Web.instance.socket.on('connection', client => client.on('message', data => {
+        const message = data.toString('utf-8')
+        if(message === 'CHATTING' && !chattingSocket.includes(client)){
+            chattingSocket.push(client)
+            client.onclose = () => chattingSocket.splice(chattingSocket.indexOf(client), 1)
+            return
+        }
+    }))
+    Chzzk.instance.chat.on('chat', chat => {
+        const badgeList: string[] = []
+        if(chat.profile?.badge?.imageUrl){
+            badgeList.push(chat.profile.badge.imageUrl)
+        }
+        if(chat.profile.streamingProperty?.subscription?.badge?.imageUrl){
+            badgeList.push(chat.profile.streamingProperty.subscription.badge.imageUrl)
+        }
+        if(chat.profile.streamingProperty?.realTimeDonationRanking?.badge?.imageUrl){
+            badgeList.push(chat.profile.streamingProperty?.realTimeDonationRanking?.badge?.imageUrl)
+        }
+        for(const activityBadge of chat.profile.activityBadges){
+            if(activityBadge.activated){
+                badgeList.push(activityBadge.imageUrl)
+                break
+            }
+        }
+        const jsonStr = JSON.stringify({
+            nickname: chat.profile.nickname,
+            color: chat.profile.title?.color || getUserColor(chat.profile.userIdHash + Chzzk.instance.chat.chatChannelId),
+            message: chat.message,
+            emojiList: chat.extras?.emojis || {},
+            badgeList
+        })
+        for(const client of chattingSocket){
+            client.send(jsonStr)
         }
     })
 }
@@ -172,10 +162,22 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
     if(!await Chzzk.setAuth(nidAuth, nidSession)){
         return false
     }
+    
+    Web.instance.socket.on('connection', client => client.on('message', data => {
+        try{
+            const json = JSON.parse(data.toString('utf-8'))
+            switch(json.type){
+                case 'SEND_MESSAGE':
+                    json.message && Chzzk.instance.chat.sendChat(json.message, json.emojis)
+                    break;
+            }
+            return
+        }catch{}
+    }))
 
-    createChattingTask()
     createVoteTask()
     createEmojiTask()
+    createChattingTask()
     createCheckFollowTask()
     
     const icon = path.join(__dirname, '../resources/icon.png')
