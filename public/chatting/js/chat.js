@@ -1,4 +1,4 @@
-let ttsURL, client, messageQueue = []
+let ttsURL, client, messageProcessCount = 0
 const playList = [] // Audio[]
 
 const findRepeatedText = (str) => {
@@ -59,84 +59,70 @@ const connect = () => {
         return;
     }
     client = new WebSocket(`ws://${window.localStorage.getItem('wsURL') || location.host || '127.0.0.1:54321'}/ws`)
-    client.onopen = () => client.send(`TTS`)
+    client.onopen = () => client.send(`CHATTING`)
     client.onmessage = e => {
-        try{
-            messageQueue.push(e.data)
-            if(messageQueue.length > 1){
+        const json = (() => {
+            try{
+                return JSON.parse(e.data.toString())
+            }catch{}
+        })()
+
+        if(typeof jsonData !== 'object'){
+            return
+        }
+
+        let delay = 70
+        if(++messageProcessCount >= 50){
+            delay = 0
+        }else if(messageProcessCount >= 30){
+            delay = 10
+        }else if(messageProcessCount >= 15){
+            delay = 20
+        }else if(messageProcessCount > 5){
+            delay = 45
+        }
+        setTimeout(() => {
+            const messageBoxDiv = document.createElement('div')
+            messageBoxDiv.className = 'messageBox'
+            document.body.appendChild(messageBoxDiv)
+
+            setTimeout(() => messageBoxDiv.style.opacity = '1', 50)
+
+            for(const badgeUrl of json.badgeList){
+                const badgeImg = document.createElement('img')
+                badgeImg.src = badgeUrl
+                messageBoxDiv.appendChild(badgeImg)
+            }
+
+            const userSpan = document.createElement('span')
+            userSpan.className = 'nickname'
+            userSpan.innerText = json.nickname
+            userSpan.style.color = json.color
+            messageBoxDiv.appendChild(userSpan)
+
+            const messageSpan = document.createElement('span')
+            messageSpan.className = 'message'
+
+            let message = escapeHTML(json.message)
+            for(const emojiName in json.emojiList){
+                message = message.replaceAll(`{:${emojiName}:}`, `<img src='${json.emojiList[emojiName]}'>`)
+            }
+            messageSpan.innerHTML = ` : ${message}`
+            messageBoxDiv.appendChild(messageSpan)
+    
+            --messageProcessCount
+            if(json.nickname.endsWith('봇')){ // TODO: tts expection
                 return
             }
-            const processMessage = () => {
-                let delay = 70
-                if(messageQueue.length >= 50){
-                    delay = 0
-                }else if(messageQueue.length >= 30){
-                    delay = 10
-                }else if(messageQueue.length >= 15){
-                    delay = 20
-                }else if(messageQueue.length > 5){
-                    delay = 45
-                }
-                setTimeout(() => {
-                    /*
-                    interface ChatData{
-                        nickname: string,
-                        color: string,
-                        message: string,
-                        emojiList: {[name: string]: string},
-                        badgeList: string[]
-                    }
-                    */
-                    const json = JSON.parse(messageQueue[0])
 
-                    const messageBoxDiv = document.createElement('div')
-                    messageBoxDiv.className = 'messageBox'
-                    document.body.appendChild(messageBoxDiv)
-
-                    setTimeout(() => messageBoxDiv.style.opacity = '1', 50)
-
-                    for(const badgeUrl of json.badgeList){
-                        const badgeImg = document.createElement('img')
-                        badgeImg.src = badgeUrl
-                        messageBoxDiv.appendChild(badgeImg)
-                    }
-
-                    const userSpan = document.createElement('span')
-                    userSpan.className = 'nickname'
-                    userSpan.innerText = json.nickname
-                    userSpan.style.color = json.color
-                    messageBoxDiv.appendChild(userSpan)
-
-                    const messageSpan = document.createElement('span')
-                    messageSpan.className = 'message'
-
-                    let message = escapeHTML(json.message)
-                    for(const emojiName in json.emojiList){
-                        message = message.replaceAll(`{:${emojiName}:}`, `<img src='${json.emojiList[emojiName]}'>`)
-                    }
-                    messageSpan.innerHTML = ` : ${message}`
-                    messageBoxDiv.appendChild(messageSpan)
-            
-                    if(json.nickname.endsWith('봇')){
-                        return
-                    }
-
-                    const repeatData = findRepeatedText(json.message)
-                    if(repeatData){
-                        const {substring, count} = repeatData
-                        playTTS(substring.repeat(substring.length < 3 ? Math.min(count, 8) : 3))
-                    }else{
-                        playTTS(json.message)
-                    }
-                    
-                    messageQueue.shift()
-                    if(messageQueue.length > 0){
-                        processMessage()
-                    }
-                }, delay)
+            const repeatData = findRepeatedText(json.message)
+            if(repeatData){
+                const {substring, count} = repeatData
+                playTTS(substring.repeat(substring.length < 3 ? Math.min(count, 8) : 3))
+            }else{
+                playTTS(json.message)
             }
-            processMessage()
-        }catch{}
+        }, delay)
     }
     client.onclose = () => setTimeout(() => connect(), 1000)
 }
