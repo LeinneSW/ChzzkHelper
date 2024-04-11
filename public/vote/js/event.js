@@ -33,24 +33,3 @@ const focusEvent = (event) => {
     }
     addVoteItem(event.target)
 }
-
-const sendChat = async () => {
-    const input = document.getElementById(`chatting-input`)
-    try{
-        const res = await fetch(`http://${getRequestUrl()}/req/send_chat`, {
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            method: 'post',
-            body: JSON.stringify({
-                message: input.value
-            })
-        })
-        if(res.status === 200){
-            input.value = ''
-            input.focus()
-            return
-        }
-    }catch{}
-    showAlertModal('오류발생', '알 수 없는 오류가 발생했습니다.')
-}

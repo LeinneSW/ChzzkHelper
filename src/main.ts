@@ -49,13 +49,6 @@ const createChattingTask = () => {
 
 const voteSocket: WebSocket[] = []
 const createVoteTask = () => {
-    Web.instance.app.post('/req/send_chat', (req, res) => {
-        res.sendStatus(200)
-        const message = req.body?.message
-        if(message){
-            Chzzk.instance.chat.sendChat(message)
-        }
-    })
     Web.instance.socket.on('connection', client => client.on('message', data => {
         const message = data.toString('utf-8')
         if(message === 'VOTE' && !voteSocket.includes(client)){
