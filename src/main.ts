@@ -7,13 +7,13 @@ import {Web} from "./web/web";
 import electronShortCut from 'electron-localshortcut';
 import windowStateKeeper from "electron-window-state";
 
-const ttsSocket: WebSocket[] = []
-const createTTSTask = () => {
+const chattingSocket: WebSocket[] = []
+const createChattingTask = () => {
     Web.instance.socket.on('connection', client => client.on('message', data => {
         const message = data.toString('utf-8')
-        if(message === 'TTS' && !ttsSocket.includes(client)){
-            ttsSocket.push(client)
-            client.onclose = () => ttsSocket.splice(ttsSocket.indexOf(client), 1)
+        if(message === 'CHATTING' && !chattingSocket.includes(client)){
+            chattingSocket.push(client)
+            client.onclose = () => chattingSocket.splice(chattingSocket.indexOf(client), 1)
             return
         }
     }))
@@ -41,7 +41,7 @@ const createTTSTask = () => {
             emojiList: chat.extras?.emojis || {},
             badgeList
         })
-        for(const client of ttsSocket){
+        for(const client of chattingSocket){
             client.send(jsonStr)
         }
     })
@@ -180,7 +180,7 @@ const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => 
         return false
     }
 
-    createTTSTask()
+    createChattingTask()
     createVoteTask()
     createEmojiTask()
     createCheckFollowTask()
