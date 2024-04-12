@@ -1,13 +1,18 @@
 .settings{
-    z-index: 9999;
     position: fixed;
     top: 10px;
     right: 10px;
     width: 320px;
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+    
+    z-index: 9999;
     background-color: #f9f9f9;
+
     border: 3px solid #beff80;
     border-radius: 9px;
-    padding: 10px;
 
     opacity: 0;
     transition: opacity .5s ease-in-out;
@@ -16,7 +21,7 @@
 .settings-title{
     font-size: 22px;
     font-weight: bold;
-    padding-bottom: 20px;
+    padding-bottom: .5em;
 }
 
 .settings.show{
@@ -65,11 +70,19 @@
     cursor: pointer;
 }
 
+.option-title{
+    margin-top: .5em;
+}
+
 .option-title, .settings-title{
     text-align: left;
 }
 
 .option-title, .slider-value{
+    font-size: 15px;
+}
+
+.option-label{
     font-size: 15px;
 }
 

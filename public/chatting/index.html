@@ -16,6 +16,15 @@
             <input class="slider" id="sizeSlider" type="range" min="10" max="40" value="20" data-suffix="px" data-save-name="chatFontSize" data-custom-css="--font-size">
             <div class="slider-value"></div>
         </div>
+        <div class="option-title">채팅 알림 설정(TTS)</div>
+        <div>
+
+            <input class="option-input" type="radio" name="enableTTS" value="1" id="enableTTS">
+            <label class="option-label" for="enableTTS">활성화</label>
+            <input class="option-input" type="radio" name="enableTTS" value="0" id="disableTTS">
+            <label class="option-label" for="disableTTS">비활성화</label>
+        </div>
+        <button class="option-label" onclick="prompt('TTS 엔진 주소를 작성해주세요')">TTS 엔진 변경</button>
     </div>
 </body>
 </html>
