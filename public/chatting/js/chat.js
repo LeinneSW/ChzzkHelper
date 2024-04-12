@@ -36,24 +36,6 @@ const escapeHTML = (text) => text.replace(/&/g, "&amp;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 
-const addChat = (nickname, text) => {
-    const messageBoxDiv = document.createElement('div')
-    messageBoxDiv.className = 'messageBox'
-    document.body.appendChild(messageBoxDiv)
-    setTimeout(() => messageBoxDiv.style.opacity = '1', 50)
-
-    const userSpan = document.createElement('span')
-    userSpan.className = 'nickname'
-    userSpan.innerText = nickname
-    userSpan.style.color = 'blue'
-    messageBoxDiv.appendChild(userSpan)
-
-    const messageSpan = document.createElement('span')
-    messageSpan.className = 'message'
-    messageSpan.innerHTML = ` : ${escapeHTML(text)}`
-    messageBoxDiv.appendChild(messageSpan)
-}
-
 const connect = () => {
     if(client?.readyState === WebSocket.OPEN){
         return;
