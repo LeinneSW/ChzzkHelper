@@ -1,4 +1,4 @@
-let ttsURL, client, messageProcessCount = 0
+let client, messageProcessCount = 0
 const playList = [] // Audio[]
 
 const getRequestUrl = () => window.localStorage.getItem('wsURL') || location.host
@@ -19,7 +19,12 @@ const findRepeatedText = (str) => {
 }
 
 const playTTS = (text) => {
-    const sound = new Audio(ttsURL.replaceAll('${text}', encodeURIComponent(text)))
+    const url = localStorage.getItem('ttsURL') || ''
+    if(!url.includes('${text}')){
+        return
+    }
+
+    const sound = new Audio(url.replaceAll('${text}', encodeURIComponent(text)))
     sound.onended = () => {
         playList.splice(playList.indexOf(sound), 1);
         if(playList.length > 0){
@@ -110,13 +115,4 @@ const connect = () => {
     }
     client.onclose = () => setTimeout(() => connect(), 1000)
 }
-
-window.addEventListener('load', () => {
-    const storage = window.localStorage
-    ttsURL = storage.getItem('ttsURL')
-    while(!ttsURL){
-        ttsURL = prompt('사용하실 TTS 엔진 URL을 입력해주세요.')
-        !ttsURL || storage.setItem('ttsURL', ttsURL)
-    }
-    connect()
-})
+window.addEventListener('load', () => connect())
