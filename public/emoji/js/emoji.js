@@ -1,6 +1,7 @@
 let client
 let sizeSlider, timeSlider, effectTypeBox
 
+const getRequestUrl = () => window.localStorage.getItem('wsURL') || location.host
 const random = (value) => Math.random() * (value - parseInt(document.documentElement.style.getPropertyValue('--emoji-size')))
 
 const showEmoji = (width, height, emojiUrl) => {
@@ -57,7 +58,7 @@ const connect = () => {
     }
 
     client?.close()
-    client = new WebSocket(`ws://${window.localStorage.getItem('wsURL') || location.host || '127.0.0.1:54321'}/ws`)
+    client = new WebSocket(`ws://${getRequestUrl()}/ws`)
     client.onopen = () => {
         checkError()
         client.send('SHOW_EMOJI')

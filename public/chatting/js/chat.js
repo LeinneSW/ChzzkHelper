@@ -1,6 +1,8 @@
 let ttsURL, client, messageProcessCount = 0
 const playList = [] // Audio[]
 
+const getRequestUrl = () => window.localStorage.getItem('wsURL') || location.host
+
 const findRepeatedText = (str) => {
     const len = Math.ceil(str.length / 4)
     for(let i = 1; i <= len; ++i){ // 문자열의 길이의 1/4 까지만 확인(4회이상 반복시를 판단하기 위해서임)
@@ -40,7 +42,7 @@ const connect = () => {
     if(client?.readyState === WebSocket.OPEN){
         return;
     }
-    client = new WebSocket(`ws://${window.localStorage.getItem('wsURL') || location.host || '127.0.0.1:54321'}/ws`)
+    client = new WebSocket(`ws://${getRequestUrl()}/ws`)
     client.onopen = () => client.send(`CHATTING`)
     client.onmessage = e => {
         const json = (() => {
