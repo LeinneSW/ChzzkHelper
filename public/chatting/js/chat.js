@@ -19,7 +19,7 @@ const findRepeatedText = (str) => {
 }
 
 const addTTS = (nickname, text) => {
-    if(nickname.endsWith('봇')){ // TODO: tts expection
+    if(nickname.match(/^.*(봇|bot)$/i)){ // TODO: tts expection
         return
     }
     
