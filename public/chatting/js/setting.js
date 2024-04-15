@@ -20,4 +20,13 @@ window.addEventListener('load', () => {
             saveName && localStorage.setItem(saveName, slider.value + '')
         })
     }
+    const radioList = document.querySelectorAll('input[type=radio]')
+    for(const radio of radioList){
+        const saveName = radio.dataset.saveName
+        radio.checked = (saveName && radio.value === localStorage.getItem(saveName)) || radio.checked
+        radio.addEventListener('input', () => {
+            const saveName = radio.dataset.saveName
+            saveName && localStorage.setItem(saveName, radio.value + '')
+        })
+    }
 })

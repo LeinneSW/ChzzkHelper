@@ -19,7 +19,7 @@ const findRepeatedText = (str) => {
 }
 
 const addTTS = (nickname, text) => {
-    if(nickname.match(/^.*(봇|bot)$/i)){ // TODO: tts expection
+    if(localStorage.getItem('tts') === '0' || nickname.match(/^.*(봇|bot)$/i)){ // TODO: tts expection
         return
     }
     
