@@ -18,7 +18,17 @@ const findRepeatedText = (str) => {
     return null;
 }
 
-const playTTS = (text) => {
+const addTTS = (nickname, text) => {
+    if(nickname.endsWith('봇')){ // TODO: tts expection
+        return
+    }
+    
+    const repeatData = findRepeatedText(text)
+    if(repeatData){
+        const {substring, count} = repeatData
+        text = substring.repeat(substring.length < 3 ? Math.min(count, 8) : 3)
+    }
+
     const url = localStorage.getItem('ttsURL') || ''
     if(!url.includes('${text}')){
         return
@@ -43,6 +53,36 @@ const escapeHTML = (text) => text.replace(/&/g, "&amp;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 
+const addMessageBox = (nickname, message, color = 'white', emojiList = {}, badgeList = []) => {
+    const messageBoxDiv = document.createElement('div')
+    messageBoxDiv.className = 'messageBox'
+    document.body.appendChild(messageBoxDiv)
+
+    setTimeout(() => messageBoxDiv.style.opacity = '1', 50)
+
+    for(const badgeUrl of badgeList){
+        const badgeImg = document.createElement('img')
+        badgeImg.src = badgeUrl
+        messageBoxDiv.appendChild(badgeImg)
+    }
+
+    const userSpan = document.createElement('span')
+    userSpan.className = 'nickname'
+    userSpan.innerText = nickname
+    userSpan.style.color = color
+    messageBoxDiv.appendChild(userSpan)
+
+    const messageSpan = document.createElement('span')
+    messageSpan.className = 'message'
+
+    message = escapeHTML(message)
+    for(const emojiName in emojiList){
+        message = message.replaceAll(`{:${emojiName}:}`, `<img src='${emojiList[emojiName]}'>`)
+    }
+    messageSpan.innerHTML = ` : ${message}`
+    messageBoxDiv.appendChild(messageSpan)
+}
+
 const connect = () => {
     if(client?.readyState === WebSocket.OPEN){
         return;
@@ -50,69 +90,13 @@ const connect = () => {
     client = new WebSocket(`ws://${getRequestUrl()}/ws`)
     client.onopen = () => client.send(`CHATTING`)
     client.onmessage = e => {
-        const json = (() => {
-            try{
-                return JSON.parse(e.data.toString())
-            }catch{}
-        })()
-
-        if(typeof json !== 'object'){
-            return
-        }
-
-        let delay = 70
-        if(++messageProcessCount >= 50){
-            delay = 0
-        }else if(messageProcessCount >= 30){
-            delay = 10
-        }else if(messageProcessCount >= 15){
-            delay = 20
-        }else if(messageProcessCount > 5){
-            delay = 45
-        }
-        setTimeout(() => {
-            const messageBoxDiv = document.createElement('div')
-            messageBoxDiv.className = 'messageBox'
-            document.body.appendChild(messageBoxDiv)
-
-            setTimeout(() => messageBoxDiv.style.opacity = '1', 50)
-
-            for(const badgeUrl of json.badgeList){
-                const badgeImg = document.createElement('img')
-                badgeImg.src = badgeUrl
-                messageBoxDiv.appendChild(badgeImg)
-            }
-
-            const userSpan = document.createElement('span')
-            userSpan.className = 'nickname'
-            userSpan.innerText = json.nickname
-            userSpan.style.color = json.color
-            messageBoxDiv.appendChild(userSpan)
-
-            const messageSpan = document.createElement('span')
-            messageSpan.className = 'message'
-
-            let message = escapeHTML(json.message)
-            for(const emojiName in json.emojiList){
-                message = message.replaceAll(`{:${emojiName}:}`, `<img src='${json.emojiList[emojiName]}'>`)
-            }
-            messageSpan.innerHTML = ` : ${message}`
-            messageBoxDiv.appendChild(messageSpan)
-    
-            --messageProcessCount
-            if(json.nickname.endsWith('봇')){ // TODO: tts expection
-                return
-            }
-
-            const repeatData = findRepeatedText(json.message)
-            if(repeatData){
-                const {substring, count} = repeatData
-                playTTS(substring.repeat(substring.length < 3 ? Math.min(count, 8) : 3))
-            }else{
-                playTTS(json.message)
-            }
-        }, delay)
+        try{
+            const json = JSON.parse(e.data.toString())
+            addMessageBox(json.nickname, json.message, json.color, json.emojiList, json.badgeList)
+            addTTS(json.nickname, json.message)
+        }catch{}
     }
     client.onclose = () => setTimeout(() => connect(), 1000)
 }
+
 window.addEventListener('load', () => connect())
