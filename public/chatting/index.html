@@ -10,12 +10,7 @@
 </head>
 <body>
     <div class="settings" id="settings">
-        <div class="settings-title left">채팅 위젯 설정</div>
-        <div class="option-title">글자 크기</div>
-        <div class="slider-container">
-            <input class="slider" id="sizeSlider" type="range" min="10" max="40" value="20" data-suffix="px" data-save-name="chatFontSize" data-custom-css="--font-size">
-            <div class="slider-value"></div>
-        </div>
+        <div class="settings-title left">설정</div>
         <div class="option-title">채팅 알림 설정(TTS)</div>
         <div>
 
@@ -24,7 +19,17 @@
             <input class="option-input" type="radio" name="enableTTS" value="0" id="disableTTS" data-save-name="tts">
             <label class="option-label" for="disableTTS">비활성화</label>
         </div>
-        <button class="option-label" onclick="prompt('TTS 엔진 주소를 작성해주세요')">TTS 엔진 변경</button>
+        <button class="option-label" onclick="prompt('TTS 엔진 주소를 작성해주세요')">TTS 엔진 변경(WIP)</button>
+        <div class="option-title">글자 크기</div>
+        <div class="slider-container">
+            <input class="slider" id="sizeSlider" type="range" min="10" max="40" value="20" data-suffix="px" data-save-name="chatFontSize" data-custom-css="--font-size">
+            <div class="slider-value"></div>
+        </div>
+        <div class="option-title">대화 자동 숨김</div>
+        <div class="slider-container">
+            <input class="slider" id="sizeSlider" type="range" min="0" max="120" value="0" data-suffix="초" data-save-name="messageRemainSeconds">
+            <div class="slider-value"></div>
+        </div>
     </div>
 </body>
 </html>

@@ -56,6 +56,7 @@ const escapeHTML = (text) => text.replace(/&/g, "&amp;")
 const addMessageBox = (nickname, message, color = 'white', emojiList = {}, badgeList = []) => {
     const messageBoxDiv = document.createElement('div')
     messageBoxDiv.className = 'messageBox'
+    messageBoxDiv.dataset.date = Date.now()
     document.body.appendChild(messageBoxDiv)
 
     setTimeout(() => messageBoxDiv.style.opacity = '1', 50)
@@ -99,4 +100,21 @@ const connect = () => {
     client.onclose = () => setTimeout(() => connect(), 1000)
 }
 
-window.addEventListener('load', () => connect())
+window.addEventListener('load', () => {
+    connect()
+    setInterval(() => {
+        const current = Date.now()
+        const messageRemainSeconds = (localStorage.getItem('messageRemainSeconds') || 0) * 1000
+        if(messageRemainSeconds < 1){
+            return
+        }
+
+        const messageBoxList = document.querySelectorAll(`body > .messageBox`)
+        for(const box of messageBoxList){
+            if(current - box.dataset.date >= messageRemainSeconds){
+                box.style.opacity = '0'
+                setTimeout(() => box.remove(), 1000)
+            }
+        }
+    }, 50)
+})
