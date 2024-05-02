@@ -11,7 +11,7 @@
 <body>
     <div class="settings" id="settings">
         <div class="settings-title left">설정</div>
-        <div class="option-title">채팅 알림 설정(TTS)</div>
+        <div class="option-title" data-description="대화 내용을 소리내어 읽어줄지를 설정합니다">채팅 알림 설정(TTS)</div>
         <div>
 
             <input class="option-input" type="radio" name="enableTTS" value="1" id="enableTTS" data-save-name="tts">
@@ -25,7 +25,7 @@
             <input class="slider" id="sizeSlider" type="range" min="10" max="40" value="20" data-suffix="px" data-save-name="chatFontSize" data-custom-css="--font-size">
             <div class="slider-value"></div>
         </div>
-        <div class="option-title">대화 자동 숨김</div>
+        <div class="option-title" data-description="대화 내용이 사라질 시간을 설정합니다.\n0으로 두면 사라지지 않습니다.">대화 자동 숨김</div>
         <div class="slider-container">
             <input class="slider" id="sizeSlider" type="range" min="0" max="120" value="0" data-suffix="초" data-save-name="messageRemainSeconds">
             <div class="slider-value"></div>

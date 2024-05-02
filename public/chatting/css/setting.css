@@ -28,6 +28,16 @@
     opacity: 1;
 }
 
+.tooltip{
+    color: #fff;
+    padding: 5px;
+    z-index: 999;
+    font-size: 17px;
+    position: absolute;
+    border-radius: 7px;
+    background-color: #616161;
+}
+
 .slider-container{
     display: flex;
     align-items: center;
