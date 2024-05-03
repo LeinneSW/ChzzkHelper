@@ -3,6 +3,20 @@ const playList = [] // Audio[]
 
 const getRequestUrl = () => window.localStorage.getItem('wsURL') || location.host
 
+const changeTTSEngine = () => {
+    let url
+    while(true){
+        url = prompt('TTS 엔진 주소를 작성해주세요', url)
+        if(url === null){
+            return
+        }else if(url.startsWith('http') && url.includes('${text}')){
+            break;
+        }
+        alert('올바른 URL 형식이 아니거나 ${text} 파라미터가 없습니다.')
+    }
+    localStorage.setItem('ttsURL', url)
+}
+
 const findRepeatedText = (str) => {
     const len = Math.ceil(str.length / 4)
     for(let i = 1; i <= len; ++i){ // 문자열의 길이의 1/4 까지만 확인(4회이상 반복시를 판단하기 위해서임)
