@@ -77,6 +77,7 @@ const addTTS = async (nickname, text) => {
     }
     for(let i = 0; !korVoice && i < 3; ++i){
         findKrVoice()
+        await new Promise((res, _) => setTimeout(res, 500))
     }
 
     if(korVoice){
