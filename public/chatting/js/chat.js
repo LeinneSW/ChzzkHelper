@@ -1,65 +1,6 @@
-let client, messageProcessCount = 0
-const playList = [] // Audio[]
+let client
 
 const getRequestUrl = () => window.localStorage.getItem('wsURL') || location.host
-
-const changeTTSEngine = () => {
-    let url
-    while(true){
-        url = prompt('TTS 엔진 주소를 작성해주세요', url)
-        if(url === null){
-            return
-        }else if(url.startsWith('http') && url.includes('${text}')){
-            break;
-        }
-        alert('올바른 URL 형식이 아니거나 ${text} 파라미터가 없습니다.')
-    }
-    localStorage.setItem('ttsURL', url)
-}
-
-const findRepeatedText = (str) => {
-    const len = Math.ceil(str.length / 4)
-    for(let i = 1; i <= len; ++i){ // 문자열의 길이의 1/4 까지만 확인(4회이상 반복시를 판단하기 위해서임)
-        let index = 0, count = 1
-        const substring = str.substring(0, i)
-        while((index = str.indexOf(substring, index + i)) !== -1){
-            ++count;
-        }
-        if(count > 3 && count * substring.length === str.length){
-            return {substring, count};
-        }
-    }
-    return null;
-}
-
-const addTTS = (nickname, text) => {
-    if(localStorage.getItem('tts') === '0' || nickname.match(/^.*(봇|bot)$/i)){ // TODO: tts expection
-        return
-    }
-    
-    const repeatData = findRepeatedText(text)
-    if(repeatData){
-        const {substring, count} = repeatData
-        text = substring.repeat(substring.length < 3 ? Math.min(count, 8) : 3)
-    }
-
-    const url = localStorage.getItem('ttsURL') || ''
-    if(!url.includes('${text}')){
-        return
-    }
-
-    const sound = new Audio(url.replaceAll('${text}', encodeURIComponent(text)))
-    sound.onended = () => {
-        playList.splice(playList.indexOf(sound), 1);
-        if(playList.length > 0){
-            playList[0].play()
-        }
-    }
-    playList.push(sound)
-    if(playList.length === 1){
-        sound.play()
-    }
-}
 
 const escapeHTML = (text) => text.replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
