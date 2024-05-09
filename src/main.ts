@@ -285,11 +285,4 @@ app.whenReady().then(async () => {
         message: '로그인이 필요한 서비스입니다.\n로그인 후 진행해주세요.'
     })
 })
-
-ipcMain.on('alert', (_, message, title) => {
-    dialog.showMessageBox({
-        type: 'info',
-        title,
-        message: message || ''
-    })
-})
+ipcMain.on('alert', (_, message: string = '', title?: string) => dialog.showMessageBox({type: 'info', title, message}))
