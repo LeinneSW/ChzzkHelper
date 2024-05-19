@@ -1,5 +1,5 @@
-let client
-let sizeSlider, timeSlider, effectTypeBox
+let effectTypeBox
+let client, errorCount = 0
 
 const getRequestUrl = () => window.localStorage.getItem('wsURL') || location.host
 const random = (value) => Math.random() * (value - parseInt(document.documentElement.style.getPropertyValue('--emoji-size')))
@@ -44,10 +44,11 @@ const showEmoji = (width, height, emojiUrl) => {
 
 const checkError = () => {
     if(client?.readyState === WebSocket.OPEN){
+        errorCount = 0
         document.body.children[0].innerText = ''
         document.body.classList.remove('error')
-    }else{
-        document.body.children[0].innerText = '치지직 도우미가 꺼져있습니다'
+    }else if(++errorCount >= 5){
+        document.body.children[0].innerText = '서버와의 연결이 끊어졌습니다'
         document.body.classList.add('error')
     }
 }
