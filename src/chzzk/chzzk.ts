@@ -1,4 +1,4 @@
-import {ChzzkChat, ChzzkClient, Follower} from "chzzk";
+import {ChzzkChat, ChzzkClient, Followers} from "chzzk";
 import {delay} from "../utils/utils";
 
 export class Chzzk{
@@ -39,10 +39,19 @@ export class Chzzk{
         public readonly channelId: string
     ){}
 
-    async getFollowerList(size: number = 10): Promise<Follower[]>{
+    async getFollowerData(size: number = 10): Promise<Followers>{
         try{
-            return (await this.client.manage.followers(this.channelId, {size})).data || []
+            const data = await this.client.manage.followers(this.channelId, {size})
+            if(data){
+                return data
+            }
         }catch{}
-        return []
+        return {
+            page: 0,
+            size: 0,
+            totalCount: 0,
+            totalPages: 0,
+            data: []
+        }
     }
 }

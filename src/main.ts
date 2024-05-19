@@ -106,19 +106,33 @@ const createChattingTask = () => {
     })
 }
 
-let followList: string[] = []
-const alertSocket: WebSocket[] = []
+let followCount: number = 0;
+let followList: string[] = [];
+const alertSocket: WebSocket[] = [];
+const followGoalSocket: WebSocket[] = [];
 const createCheckFollowTask = () => {
     Web.instance.socket.on('connection', client => {
         client.on('message', data => {
-            if(data.toString('utf-8') === 'ALERT' && !alertSocket.includes(client)){
-                alertSocket.push(client)
-                client.onclose = () => alertSocket.splice(alertSocket.indexOf(client), 1)
+            const message = data.toString('utf-8')
+            switch(message){
+                case 'ALERT':
+                    if(!alertSocket.includes(client)){
+                        alertSocket.push(client);
+                        client.onclose = () => alertSocket.splice(alertSocket.indexOf(client), 1);
+                    }
+                    break;
+                case 'FOLLOW_GOAL':
+                    if(!followGoalSocket.includes(client)){
+                        client.send(followCount + '');
+                        followGoalSocket.push(client);
+                        client.onclose = () => followGoalSocket.splice(followGoalSocket.indexOf(client), 1);
+                    }
+                    break;
             }
         })
     })
     Web.instance.app.post('/req/test_alert', (_, res) => {
-        res.sendStatus(200)
+        res.sendStatus(200);
         const json = JSON.stringify({
             type: `팔로우`,
             user: {
@@ -137,21 +151,31 @@ const createCheckFollowTask = () => {
         }
     }).catch(async () => {
         const list = [];
-        for(const user of await Chzzk.instance.getFollowerList(10000)){
+        const followData = await Chzzk.instance.getFollowerData(10000);
+        followCount = followData.totalCount;
+        for(const user of followData.data){
             list.push(user.user.userIdHash)
         }
         await saveResource('follow.txt', list.join('\n'))
     }).then(() => setInterval(async () => {
-        const newData = (await Chzzk.instance.getFollowerList(10)).filter(user => !followList.includes(user.user.userIdHash))
-        if(newData.length > 0){
-            for(const followData of newData){
-                followList.push(followData.user.userIdHash)
-                const json = JSON.stringify({type: '팔로우', user: followData.user});
+        let isAdded = false;
+        const followData = await Chzzk.instance.getFollowerData(10);
+        followCount = followData.totalCount;
+        for(const user of followData.data){
+            if(!followList.includes(user.user.userIdHash)){
+                isAdded = true
+                followList.push(user.user.userIdHash)
+                const json = JSON.stringify({type: '팔로우', user: user.user});
                 for(const client of alertSocket){
                     client.send(json)
                 }
             }
-            await saveResource('follow.txt', followList.join('\n'))
+        }
+        if(isAdded){
+            for(const client of followGoalSocket){
+                client.send(followCount + '');
+            }
+            await saveResource('follow.txt', followList.join('\n'));
         }
     }, 10000))
 }
