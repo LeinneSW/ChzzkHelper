@@ -110,7 +110,7 @@ let followCount: number = 0;
 let followList: string[] = [];
 const alertSocket: WebSocket[] = [];
 const followGoalSocket: WebSocket[] = [];
-const createCheckFollowTask = () => {
+const createCheckFollowTask = async () => {
     Web.instance.socket.on('connection', client => {
         client.on('message', data => {
             const message = data.toString('utf-8')
@@ -129,8 +129,8 @@ const createCheckFollowTask = () => {
                     }
                     break;
             }
-        })
-    })
+        });
+    });
     Web.instance.app.post('/req/test_alert', (_, res) => {
         res.sendStatus(200);
         const json = JSON.stringify({
@@ -140,24 +140,33 @@ const createCheckFollowTask = () => {
             },
         });
         for(const client of alertSocket){
-            client.send(json)
+            client.send(json);
         }
-    })
+    });
 
-    readResource(`follow.txt`).then(file => {
+    try{
+        const file = await readResource(`follow.txt`);
         for(let data of file.split('\n')){
-            data = data.trim().replace(/\s/g, '')
-            data && followList.push(data)
+            data = data.trim().replace(/\s/g, '');
+            if(!data){
+                continue;
+            }
+            if(data.startsWith('$<FOLLOW_COUNT>:')){
+                followCount = +data.split(':')[1];
+            }else{
+                followList.push(data);
+            }
         }
-    }).catch(async () => {
+    }catch{
         const list = [];
         const followData = await Chzzk.instance.getFollowerData(10000);
         followCount = followData.totalCount;
         for(const user of followData.data){
             list.push(user.user.userIdHash)
         }
-        await saveResource('follow.txt', list.join('\n'))
-    }).then(() => setInterval(async () => {
+        await saveResource('follow.txt', list.join('\n') + `\n$<FOLLOW_COUNT>:${followCount}`);
+    }
+    setInterval(async () => {
         let isAdded = false;
         const followData = await Chzzk.instance.getFollowerData(10);
         followCount = followData.totalCount;
@@ -167,7 +176,7 @@ const createCheckFollowTask = () => {
                 followList.push(user.user.userIdHash)
                 const json = JSON.stringify({type: '팔로우', user: user.user});
                 for(const client of alertSocket){
-                    client.send(json)
+                    client.send(json);
                 }
             }
         }
@@ -175,9 +184,9 @@ const createCheckFollowTask = () => {
             for(const client of followGoalSocket){
                 client.send(followCount + '');
             }
-            await saveResource('follow.txt', followList.join('\n'));
+            await saveResource('follow.txt', followList.join('\n') + `\n$<FOLLOW_COUNT>:${followCount}`);
         }
-    }, 10000))
+    }, 10000);
 }
 
 const acquireAuthPhase = async (session: Electron.Session): Promise<boolean> => {
