@@ -1,5 +1,7 @@
 let client;
 
+const isNumeric = (data) => typeof data === 'number' && !isNaN(data) && isFinite(data);
+
 const getRequestUrl = () => window.localStorage.getItem('wsURL') || location.host || '127.0.0.1:54321'
 
 const connect = () => {
@@ -20,9 +22,14 @@ const connect = () => {
         try{
             const followCount = parseInt(e.data.toString());
             if(!isNaN(followCount) && isFinite(followCount)){
-                const goalCount = +(localStorage.getItem('followerGoalCount') || 150);
+                const goalCount = Math.floor(+(localStorage.getItem('followerGoalCount') || 150));
+                if(!isNumeric(goalCount) || goalCount < 1){
+                    background.style.width = '100%';
+                    return;
+                }else{
+                    background.style.width = Math.ceil(followCount / goalCount * 100) + '%';
+                }
                 countDiv.innerText = `${followCount}/${goalCount} 팔로워`;
-                background.style.width = Math.ceil(followCount / goalCount * 100) + '%';
             }
         }catch{}
     }
