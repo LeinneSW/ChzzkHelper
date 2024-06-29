@@ -93,9 +93,16 @@ const createChattingTask = () => {
                 break
             }
         }
+        // TODO: @ts-ignore must be removed after pull request #34 of the chzzk module has been approved
+        const color = chat.profile.title?.color ?? 
+            // @ts-ignore
+            (chat.profile.streamingProperty?.nicknameColor?.colorCode !== "CC000" 
+            // @ts-ignore
+            ? getCheatKeyColor(chat.profile.streamingProperty.nicknameColor.colorCode) 
+            : getUserColor(chat.profile.userIdHash + Chzzk.instance.chat.chatChannelId))
         const jsonStr = JSON.stringify({
             nickname: chat.profile.nickname,
-            color: chat.profile.title?.color || getUserColor(chat.profile.userIdHash + Chzzk.instance.chat.chatChannelId),
+            color,
             message: chat.message,
             emojiList: chat.extras?.emojis || {},
             badgeList
