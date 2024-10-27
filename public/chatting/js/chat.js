@@ -49,7 +49,6 @@ const connect = () => {
         try{
             const json = JSON.parse(e.data.toString())
             addMessageBox(json.nickname, json.message, json.color, json.emojiList, json.badgeList)
-            addTTS(json.nickname, json.message)
         }catch{}
     }
     client.onclose = () => setTimeout(() => connect(), 1000)
