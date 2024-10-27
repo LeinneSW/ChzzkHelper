@@ -2,7 +2,7 @@ import {app, BrowserWindow, Tray, dialog, Menu, ipcMain} from "electron";
 import {WebSocket} from 'ws'
 import path from 'path'
 import {Chzzk} from "./chzzk/chzzk";
-import {getUserColor, readResource, saveResource} from "./utils/utils";
+import {getCheatKeyColor, getUserColor, readResource, saveResource} from "./utils/utils";
 import {Web} from "./web/web";
 import electronShortCut from 'electron-localshortcut';
 import windowStateKeeper from "electron-window-state";
