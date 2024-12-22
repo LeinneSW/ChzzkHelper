@@ -91,11 +91,9 @@ const createChattingTask = () => {
         for(const viewerBadge of chat.profile.viewerBadges){
             badgeList.push(viewerBadge.badge.imageUrl)
         }
-        // TODO: @ts-ignore must be removed after pull request #34 of the chzzk module has been approved
-        const color = chat.profile.title?.color ?? 
-            // @ts-ignore
-            (chat.profile.streamingProperty?.nicknameColor?.colorCode !== "CC000" 
-            // @ts-ignore
+
+        const color = chat.profile.title?.color ??
+            (chat.profile.streamingProperty?.nicknameColor?.colorCode !== "CC000"
             ? getCheatKeyColor(chat.profile.streamingProperty.nicknameColor.colorCode) 
             : getUserColor(chat.profile.userIdHash + Chzzk.instance.chat.chatChannelId))
         const jsonStr = JSON.stringify({
