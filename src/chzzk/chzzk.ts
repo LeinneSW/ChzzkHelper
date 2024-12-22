@@ -22,10 +22,14 @@ export class Chzzk{
                     await delay(1000)
                 }
             }
-            const chat = client.chat({
-                channelId,
-                pollInterval: 20 * 1000 // 20초
-            })
+            const chat = client.chat({channelId, pollInterval: 10 * 1000})
+            let once = false;
+            chat.on('connect', () => {
+                if(!once){
+                    once = true;
+                    chat.requestRecentChat(30);
+                }
+            });
             chat.connect()
             this._instance = new Chzzk(chat, client, channelId)
             return true

@@ -68,8 +68,12 @@ const createEmojiTask = () => {
 
 const chattingSocket: WebSocket[] = []
 const createChattingTask = () => {
+    let history: string[] = [];
     Web.instance.socket.on('connection', client => client.on('message', data => {
         const message = data.toString('utf-8')
+        for(const h of history){
+            client.send(h);
+        }
         if(message === 'CHATTING' && !chattingSocket.includes(client)){
             chattingSocket.push(client)
             client.onclose = () => chattingSocket.splice(chattingSocket.indexOf(client), 1)
@@ -96,13 +100,18 @@ const createChattingTask = () => {
             (chat.profile.streamingProperty?.nicknameColor?.colorCode !== "CC000"
             ? getCheatKeyColor(chat.profile.streamingProperty.nicknameColor.colorCode) 
             : getUserColor(chat.profile.userIdHash + Chzzk.instance.chat.chatChannelId))
+        if(history.length >= 30){
+            history.shift();
+        }
         const jsonStr = JSON.stringify({
             nickname: chat.profile.nickname,
             color,
             message: chat.message,
             emojiList: chat.extras?.emojis || {},
-            badgeList
+            badgeList,
+            date: chat.time
         })
+        history.push(jsonStr)
         for(const client of chattingSocket){
             client.send(jsonStr)
         }

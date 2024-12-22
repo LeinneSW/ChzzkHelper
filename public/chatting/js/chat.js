@@ -8,10 +8,10 @@ const escapeHTML = (text) => text.replace(/&/g, "&amp;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 
-const addMessageBox = (nickname, message, color = 'white', emojiList = {}, badgeList = []) => {
+const addMessageBox = (nickname, message, date = Date.now(), color = 'white', emojiList = {}, badgeList = []) => {
     const messageBoxDiv = document.createElement('div')
     messageBoxDiv.className = 'message-box'
-    messageBoxDiv.dataset.date = Date.now() + ''
+    messageBoxDiv.dataset.date = date + ''
     document.body.appendChild(messageBoxDiv)
 
     setTimeout(() => messageBoxDiv.style.opacity = '1', 50)
@@ -49,7 +49,7 @@ const connect = () => {
     client.onmessage = e => {
         try{
             const json = JSON.parse(e.data.toString())
-            addMessageBox(json.nickname, json.message, json.color, json.emojiList, json.badgeList)
+            addMessageBox(json.nickname, json.message, json.date, json.color, json.emojiList, json.badgeList)
         }catch{}
     }
     client.onclose = () => setTimeout(() => connect(), 1000)
@@ -65,10 +65,14 @@ window.addEventListener('load', () => {
         }
 
         const messageBoxList = document.querySelectorAll(`body > .message-box`)
+        for(let i = 0; i < messageBoxList.length - 30; ++i){
+            const box = messageBoxList[i];
+            box.style.opacity = '0'
+            setTimeout(() => box?.remove(), 1000);
+        }
         for(const box of messageBoxList){
             if(current - box.dataset.date >= messageRemainSeconds){
                 box.style.opacity = '0'
-                setTimeout(() => box.remove(), 1000)
             }
         }
     }, 50)
