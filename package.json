@@ -4,6 +4,7 @@
   "description": "치지직 도우미",
   "main": "build/main.js",
   "scripts": {
+    "exe": "tsc && electron-builder --win --x64",
     "start": "tsc && cross-env DEBUG=true electron .",
     "build": "tsc && electron-builder --win portable --x64"
   },
