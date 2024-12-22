@@ -81,17 +81,15 @@ const createChattingTask = () => {
         if(chat.profile?.badge?.imageUrl){
             badgeList.push(chat.profile.badge.imageUrl)
         }
+        if(chat.profile.streamingProperty?.realTimeDonationRanking?.badge?.imageUrl){
+            badgeList.push(chat.profile.streamingProperty.realTimeDonationRanking.badge.imageUrl)
+        }
         if(chat.profile.streamingProperty?.subscription?.badge?.imageUrl){
             badgeList.push(chat.profile.streamingProperty.subscription.badge.imageUrl)
         }
-        if(chat.profile.streamingProperty?.realTimeDonationRanking?.badge?.imageUrl){
-            badgeList.push(chat.profile.streamingProperty?.realTimeDonationRanking?.badge?.imageUrl)
-        }
-        for(const activityBadge of chat.profile.activityBadges){
-            if(activityBadge.activated){
-                badgeList.push(activityBadge.imageUrl)
-                break
-            }
+        // @ts-ignore
+        for(const viewerBadge of chat.profile.viewerBadges){
+            badgeList.push(viewerBadge.badge.imageUrl)
         }
         // TODO: @ts-ignore must be removed after pull request #34 of the chzzk module has been approved
         const color = chat.profile.title?.color ?? 
