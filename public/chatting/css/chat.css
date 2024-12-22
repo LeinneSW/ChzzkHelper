@@ -10,7 +10,7 @@
 }
 
 *{
-    font-family: 'JalnanGothic';
+    font-family: 'JalnanGothic', sans-serif;
     box-sizing: border-box;
     font-size: var(--font-size);
 }
