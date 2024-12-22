@@ -71,11 +71,11 @@ const createChattingTask = () => {
     let history: string[] = [];
     Web.instance.socket.on('connection', client => client.on('message', data => {
         const message = data.toString('utf-8')
-        for(const h of history){
-            client.send(h);
-        }
         if(message === 'CHATTING' && !chattingSocket.includes(client)){
             chattingSocket.push(client)
+            for(const h of history){
+                client.send(h);
+            }
             client.onclose = () => chattingSocket.splice(chattingSocket.indexOf(client), 1)
             return
         }
