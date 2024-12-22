@@ -11,6 +11,7 @@
 
 *{
     font-family: 'JalnanGothic';
+    box-sizing: border-box;
     font-size: var(--font-size);
 }
 
@@ -27,23 +28,29 @@ body, html{
 img{
     width: var(--font-size);
     height: var(--font-size);
-    margin-bottom: -.11em;
+    margin-bottom: .1em;
 }
 
-.messageBox{
-    width: calc(100% - 16px);
+img + img{
+    margin-left: 2px;
+}
+
+.message-box{
     margin: 8px;
     padding: 8px;
     border-radius: 4px;
-    box-sizing: border-box;
     background-color: rgba(0, 0, 0, 0.4);
 
     opacity: 0;
     transition: all .5s ease-in-out;
 }
 
+.message-box > *{
+    vertical-align: middle;
+}
+
 .nickname{
-    padding-left: 5px;
+    padding-left: 4px;
 }
 
 .nickname, .message{

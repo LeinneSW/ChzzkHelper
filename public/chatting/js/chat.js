@@ -10,14 +10,15 @@ const escapeHTML = (text) => text.replace(/&/g, "&amp;")
 
 const addMessageBox = (nickname, message, color = 'white', emojiList = {}, badgeList = []) => {
     const messageBoxDiv = document.createElement('div')
-    messageBoxDiv.className = 'messageBox'
-    messageBoxDiv.dataset.date = Date.now()
+    messageBoxDiv.className = 'message-box'
+    messageBoxDiv.dataset.date = Date.now() + ''
     document.body.appendChild(messageBoxDiv)
 
     setTimeout(() => messageBoxDiv.style.opacity = '1', 50)
 
     for(const badgeUrl of badgeList){
         const badgeImg = document.createElement('img')
+        badgeImg.alt = 'badge'
         badgeImg.src = badgeUrl
         messageBoxDiv.appendChild(badgeImg)
     }
@@ -33,7 +34,7 @@ const addMessageBox = (nickname, message, color = 'white', emojiList = {}, badge
 
     message = escapeHTML(message)
     for(const emojiName in emojiList){
-        message = message.replaceAll(`{:${emojiName}:}`, `<img src='${emojiList[emojiName]}'>`)
+        message = message.replaceAll(`{:${emojiName}:}`, `<img src='${emojiList[emojiName]}' alt="emoji">`)
     }
     messageSpan.innerHTML = ` : ${message}`
     messageBoxDiv.appendChild(messageSpan)
@@ -63,7 +64,7 @@ window.addEventListener('load', () => {
             return
         }
 
-        const messageBoxList = document.querySelectorAll(`body > .messageBox`)
+        const messageBoxList = document.querySelectorAll(`body > .message-box`)
         for(const box of messageBoxList){
             if(current - box.dataset.date >= messageRemainSeconds){
                 box.style.opacity = '0'
