@@ -1,4 +1,4 @@
-# ChzzkHelper
+# chzzk-helper
 치지직 도우미
 
 # 실행
